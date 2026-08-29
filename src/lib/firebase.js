@@ -2,14 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Placeholder configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyPlaceholderKey123",
-  authDomain: "vanprabha-mock.firebaseapp.com",
-  projectId: "vanprabha-mock",
-  storageBucket: "vanprabha-mock.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef123456"
+  apiKey: "AIzaSyAn4zCXC3n2AKmNtCkreTDijLnAeHmBMMk",
+  authDomain: "vanprabha.firebaseapp.com",
+  projectId: "vanprabha",
+  storageBucket: "vanprabha.firebasestorage.app",
+  messagingSenderId: "727105156480",
+  appId: "1:727105156480:web:13088422cda2b830d77d65",
+  measurementId: "G-B1S6TH0CNX"
 };
 
 const app = initializeApp(firebaseConfig);
