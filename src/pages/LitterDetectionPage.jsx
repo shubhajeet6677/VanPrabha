@@ -21,13 +21,40 @@ import {
 } from 'lucide-react';
 
 export default function LitterDetectionPage() {
-  const { subTab } = useParams();
+  const { subTab, siteId, cameraId } = useParams();
   const navigate = useNavigate();
   const { showSuccess } = useToast();
 
   const [sites, setSites] = useState(LITTER_SITES);
-  const [selectedSite, setSelectedSite] = useState(null);
-  const [selectedCamera, setSelectedCamera] = useState(null);
+
+  // Helper to slugify site names
+  const getSiteSlug = (site) => site.name.toLowerCase().replace(/\s+/g, '-');
+  const getCameraSlug = (cam) => cam.name.toLowerCase().replace(/\s+/g, '-');
+
+  // Determine static tab vs site param
+  const activeSubTab = ['cameras', 'history', 'heatmap'].includes(subTab) ? subTab : null;
+
+  // Determine site param: either from siteId param or subTab param (if subTab is site slug)
+  const targetSiteSlug = siteId || (!activeSubTab && subTab !== 'live' ? subTab : null);
+
+  const selectedSite = targetSiteSlug
+    ? sites.find(s =>
+        s.id.toLowerCase() === targetSiteSlug.toLowerCase() ||
+        getSiteSlug(s) === targetSiteSlug.toLowerCase() ||
+        s.name.toLowerCase().replace(/[^a-z0-9]/g, '') === targetSiteSlug.toLowerCase().replace(/[^a-z0-9]/g, '')
+      )
+    : null;
+
+  const currentSiteSlug = selectedSite ? getSiteSlug(selectedSite) : '';
+
+  const selectedCamera = (selectedSite && cameraId)
+    ? selectedSite.cameras.find(c =>
+        c.id.toLowerCase() === cameraId.toLowerCase() ||
+        getCameraSlug(c) === cameraId.toLowerCase() ||
+        c.name.toLowerCase().replace(/[^a-z0-9]/g, '') === cameraId.toLowerCase().replace(/[^a-z0-9]/g, '') ||
+        `camera-${c.name.match(/\d+/)?.[0]}` === cameraId.toLowerCase()
+      )
+    : null;
 
   // Toggle detection status (Pending <-> Cleaned)
   const toggleDetectionStatus = (cardId) => {
@@ -48,17 +75,25 @@ export default function LitterDetectionPage() {
       )
     };
 
-    setSelectedCamera(updatedCamera);
+    setSites(sites.map(s => {
+      if (s.id === selectedSite.id) {
+        return {
+          ...s,
+          cameras: s.cameras.map(c => c.id === updatedCamera.id ? updatedCamera : c)
+        };
+      }
+      return s;
+    }));
     showSuccess(`Litter detection item status updated to "${updatedStatus}".`);
   };
 
   // Build breadcrumb items
   const breadcrumbItems = [
     { label: 'Litter Detection', link: '/litter/live' },
-    ...(subTab === 'cameras' ? [{ label: 'Camera Fleet' }] : []),
-    ...(subTab === 'history' ? [{ label: 'Incident History' }] : []),
-    ...(subTab === 'heatmap' ? [{ label: 'Density Heatmap' }] : []),
-    ...(selectedSite ? [{ label: selectedSite.name }] : []),
+    ...(activeSubTab === 'cameras' ? [{ label: 'Camera Fleet' }] : []),
+    ...(activeSubTab === 'history' ? [{ label: 'Incident History' }] : []),
+    ...(activeSubTab === 'heatmap' ? [{ label: 'Density Heatmap' }] : []),
+    ...(selectedSite ? [{ label: selectedSite.name, link: `/litter/${currentSiteSlug}` }] : []),
     ...(selectedCamera ? [{ label: selectedCamera.name }] : [])
   ];
 
@@ -82,7 +117,7 @@ export default function LitterDetectionPage() {
         </div>
       </div>
 
-      {subTab === 'cameras' ? (
+      {activeSubTab === 'cameras' ? (
         /* CAMERA MANAGEMENT VIEW */
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
           <div className="border-b border-slate-100 pb-3">
@@ -110,7 +145,7 @@ export default function LitterDetectionPage() {
             ))}
           </div>
         </div>
-      ) : subTab === 'history' ? (
+      ) : activeSubTab === 'history' ? (
         /* DETECTION HISTORY VIEW */
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
           <div className="border-b border-slate-100 pb-3">
@@ -141,7 +176,6 @@ export default function LitterDetectionPage() {
                   <span className={`text-xs font-bold px-2.5 py-0.5 rounded ${
                     det.status === 'Cleaned' ? 'bg-emerald-100 text-emerald-800 status-glow-online' : 'bg-red-100 text-red-800 status-glow-offline'
                   }`}>
-
                     {det.status}
                   </span>
                 </div>
@@ -149,7 +183,7 @@ export default function LitterDetectionPage() {
             ))}
           </div>
         </div>
-      ) : subTab === 'heatmap' ? (
+      ) : activeSubTab === 'heatmap' ? (
         /* HEATMAP VIEW */
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div className="border-b border-slate-100 pb-3">
@@ -178,7 +212,7 @@ export default function LitterDetectionPage() {
         /* FULL CAMERA STREAM VIEW WITH PULSING LIVE BADGE & BOUNDING BOXES */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedCamera(null)}
+            onClick={() => navigate(`/litter/${currentSiteSlug}`)}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -323,7 +357,7 @@ export default function LitterDetectionPage() {
         /* SITE'S 5 CAMERA CARDS GRID */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedSite(null)}
+            onClick={() => navigate('/litter/live')}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -345,7 +379,7 @@ export default function LitterDetectionPage() {
               {selectedSite.cameras.map((cam) => (
                 <div
                   key={cam.id}
-                  onClick={() => setSelectedCamera(cam)}
+                  onClick={() => navigate(`/litter/${currentSiteSlug}/${getCameraSlug(cam)}`)}
                   className="bg-slate-50 rounded-xl border border-slate-200 hover:border-[#2D6A4F] hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-col justify-between group"
                 >
                   <div className="relative h-44 overflow-hidden">
@@ -396,7 +430,7 @@ export default function LitterDetectionPage() {
           {sites.map((site) => (
             <div
               key={site.id}
-              onClick={() => setSelectedSite(site)}
+              onClick={() => navigate(`/litter/${getSiteSlug(site)}`)}
               className="bg-white p-5 rounded-xl border border-slate-200 hover:border-[#2D6A4F] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group"
             >
               <div>

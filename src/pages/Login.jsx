@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { Trees, ShieldCheck, ArrowRight, Check } from 'lucide-react';
+import { Trees, ShieldCheck, ArrowRight, Check, AlertCircle } from 'lucide-react';
 import { DIVISIONS, DIVISION_ZONES, ROLES, OFFICERS } from '../data/mockData';
 
 export default function Login() {
@@ -19,6 +19,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [formTouched, setFormTouched] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
+  const [capsLockOff, setCapsLockOff] = useState(false);
 
   const handleDivisionChange = (e) => {
     const selectedDiv = e.target.value;
@@ -26,10 +27,77 @@ export default function Login() {
     setZone(DIVISION_ZONES[selectedDiv][0]);
   };
 
+  // Helper to format Officer ID as VP-ROLE-000
+  const formatOfficerId = (val) => {
+    if (!val) return '';
+    let clean = val.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!clean) return '';
+
+    if (clean.startsWith('VP')) {
+      let rest = clean.slice(2);
+      if (!rest) return 'VP';
+
+      let prefix = '';
+      let digits = '';
+
+      if (rest.startsWith('ADC') || rest.startsWith('ADM')) {
+        prefix = rest.slice(0, 3);
+        digits = rest.slice(3);
+      } else if (rest.length >= 2) {
+        prefix = rest.slice(0, 2);
+        digits = rest.slice(2);
+      } else {
+        prefix = rest;
+      }
+
+      let result = 'VP-' + prefix;
+      if (digits) {
+        result += '-' + digits.slice(0, 3);
+      }
+      return result;
+    }
+
+    if (clean.startsWith('ADC') || clean.startsWith('ADM')) {
+      let prefix = clean.slice(0, 3);
+      let digits = clean.slice(3);
+      return 'VP-' + prefix + (digits ? '-' + digits.slice(0, 3) : '');
+    }
+
+    const match2 = clean.match(/^(DG|DC|ZC|CS|FW|LI)(.*)/);
+    if (match2) {
+      return 'VP-' + match2[1] + (match2[2] ? '-' + match2[2].slice(0, 3) : '');
+    }
+
+    return clean;
+  };
+
+  // Auto detect role from Officer ID prefix
+  const detectRoleFromPrefix = (idVal) => {
+    if (idVal.includes('VP-DG')) return 'Director General';
+    if (idVal.includes('VP-DC')) return 'Division Conservator';
+    if (idVal.includes('VP-ZC')) return 'Zone Conservator';
+    if (idVal.includes('VP-CS')) return 'Cluster Supervisor';
+    if (idVal.includes('VP-FW')) return 'Field Warden';
+    if (idVal.includes('VP-LI')) return 'Litter Inspector';
+    if (idVal.includes('VP-ADM')) return 'System Admin';
+    if (idVal.includes('VP-ADC')) return 'Division Conservator';
+    return null;
+  };
+
   // Auto match officer when ID is typed/selected
-  const handleOfficerIdChange = (idVal) => {
-    setOfficerId(idVal);
-    const matched = OFFICERS.find(o => o.id.toLowerCase() === idVal.trim().toLowerCase());
+  const handleOfficerIdChange = (e) => {
+    const rawVal = e.target.value;
+    const formatted = formatOfficerId(rawVal);
+    setOfficerId(formatted);
+
+    // Auto detect role
+    const detectedRole = detectRoleFromPrefix(formatted);
+    if (detectedRole) {
+      setRole(detectedRole);
+    }
+
+    // Match exact officer in mock dataset if present
+    const matched = OFFICERS.find(o => o.id.toLowerCase() === formatted.trim().toLowerCase());
     if (matched) {
       setFullName(matched.name);
       setRole(matched.role);
@@ -43,14 +111,36 @@ export default function Login() {
     }
   };
 
+  const handleKeyCapsCheck = (e) => {
+    if (typeof e.getModifierState === 'function') {
+      const isCapsOn = e.getModifierState('CapsLock');
+      setCapsLockOff(!isCapsOn);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormTouched(true);
 
-    if (!fullName.trim() || !officerId.trim() || !password.trim()) {
+    const formattedId = officerId.trim();
+
+    if (!fullName.trim() || !formattedId || !password.trim()) {
       const errMsg = 'Please fill in all required officer credentials.';
       setError(errMsg);
       showError(errMsg);
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      return;
+    }
+
+    // Check if officer ID exists or follows standard pattern
+    const officerMatch = OFFICERS.find(o => o.id.toLowerCase() === formattedId.toLowerCase());
+    const isValidFormat = /^VP-(DG|DC|ZC|CS|FW|LI|ADM|ADC)-\d{3}$/.test(formattedId);
+
+    if (!officerMatch && !isValidFormat) {
+      const helpfulErr = 'Officer ID not found. Your ID should look like VP-FW-001. Check your role prefix and try again.';
+      setError(helpfulErr);
+      showError(helpfulErr);
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       return;
@@ -61,9 +151,10 @@ export default function Login() {
       zone,
       role,
       fullName: fullName.trim(),
-      officerId: officerId.trim()
+      officerId: formattedId
     };
 
+    setError('');
     loginOfficer(officerData);
     showSuccess(`Welcome back, Officer ${officerData.fullName}! Access granted.`);
     navigate('/dashboard');
@@ -90,8 +181,9 @@ export default function Login() {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 text-xs font-medium rounded-md text-center">
-            {error}
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 text-xs font-medium rounded-md text-left flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
@@ -190,15 +282,17 @@ export default function Login() {
               ) : formTouched ? (
                 <span className="text-red-500 text-[11px] font-semibold">This field is required</span>
               ) : (
-                <span className="text-[10px] text-slate-400 font-normal">e.g. VP-DG-001</span>
+                <span className="text-[10px] text-slate-400 font-normal">e.g. VP-FW-001</span>
               )}
             </label>
             <input
               type="text"
               value={officerId}
-              onChange={(e) => handleOfficerIdChange(e.target.value)}
-              placeholder="VP-DG-001"
-              className={`w-full px-3 py-2.5 text-xs font-medium font-mono bg-slate-50 border rounded-md focus:outline-none transition-colors ${
+              onChange={handleOfficerIdChange}
+              onKeyDown={handleKeyCapsCheck}
+              onKeyUp={handleKeyCapsCheck}
+              placeholder="VP-FW-001"
+              className={`w-full px-3 py-2.5 text-xs font-medium font-mono bg-slate-50 border rounded-md focus:outline-none transition-colors uppercase ${
                 formTouched && !officerId.trim()
                   ? 'border-red-500 bg-red-50/30'
                   : officerId.trim()
@@ -206,6 +300,11 @@ export default function Login() {
                   : 'border-slate-300'
               }`}
             />
+            {capsLockOff && officerId.length > 0 && (
+              <div className="text-amber-600 text-[11px] font-semibold mt-1 flex items-center gap-1">
+                ⚠️ Caps Lock is off — IDs are uppercase
+              </div>
+            )}
           </div>
 
           {/* 6. Password (Masked) */}

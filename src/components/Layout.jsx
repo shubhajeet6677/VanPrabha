@@ -7,9 +7,21 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('vanprabha_sidebar_collapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const location = useLocation();
+
+  const toggleCollapse = () => {
+    setIsCollapsed(prev => {
+      const next = !prev;
+      localStorage.setItem('vanprabha_sidebar_collapsed', JSON.stringify(next));
+      return next;
+    });
+  };
 
   // Route change skeleton loading effect (at least 600ms duration)
   useEffect(() => {
@@ -24,7 +36,12 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#FAFAF8] flex font-sans">
       {/* Sidebar Navigation */}
-      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <Sidebar 
+        isOpen={sidebarOpen} 
+        setIsOpen={setSidebarOpen} 
+        isCollapsed={isCollapsed}
+        toggleCollapse={toggleCollapse}
+      />
 
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
@@ -35,7 +52,9 @@ export default function Layout({ children }) {
       )}
 
       {/* Main Content Viewport Area */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
+      <div className={`flex-1 transition-all duration-300 flex flex-col min-w-0 ${
+        isCollapsed ? 'lg:ml-20' : 'lg:ml-64'
+      }`}>
         
         {/* Top Header Bar */}
         <header className="sticky top-0 z-20 h-16 bg-[#1B4332] border-b border-emerald-800 text-white shadow-sm px-4 sm:px-6 flex items-center justify-between">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { useToast } from '../contexts/ToastContext';
@@ -31,12 +32,36 @@ import {
 
 export default function AlertsPage() {
   const { currentUser } = useAuth();
+  const { siteId, issueId } = useParams();
+  const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
   const officerName = currentUser?.fullName || 'Officer Vikram Singh';
 
   const [sites, setSites] = useState(ALERT_SITES);
-  const [selectedSite, setSelectedSite] = useState(null);
-  const [selectedIssue, setSelectedIssue] = useState(null);
+
+  // Helpers for slugs
+  const getSiteSlug = (site) => site.name.toLowerCase().replace(/\s+/g, '-');
+  const getIssueSlug = (issue) => issue.id.toLowerCase();
+
+  // Derive selected Site and Issue from URL params
+  const selectedSite = siteId
+    ? sites.find(s =>
+        s.id.toLowerCase() === siteId.toLowerCase() ||
+        getSiteSlug(s) === siteId.toLowerCase() ||
+        s.name.toLowerCase().replace(/[^a-z0-9]/g, '') === siteId.toLowerCase().replace(/[^a-z0-9]/g, '')
+      )
+    : null;
+
+  const currentSiteSlug = selectedSite ? getSiteSlug(selectedSite) : '';
+
+  const selectedIssue = (selectedSite && issueId)
+    ? selectedSite.issues.find(i =>
+        i.id.toLowerCase() === issueId.toLowerCase() ||
+        i.title.toLowerCase().replace(/\s+/g, '-') === issueId.toLowerCase() ||
+        i.id.toLowerCase().replace(/[^a-z0-9]/g, '') === issueId.toLowerCase().replace(/[^a-z0-9]/g, '') ||
+        `issue-${i.id.match(/\d+/)?.[0]}` === issueId.toLowerCase()
+      )
+    : null;
 
   // New Action Log Note state
   const [actionNote, setActionNote] = useState('');
@@ -60,7 +85,6 @@ export default function AlertsPage() {
       actionLogs: [...selectedIssue.actionLogs, logEntry]
     };
 
-    setSelectedIssue(updatedIssue);
     setActionNote('');
 
     if (actionType === 'Mark Resolved') {
@@ -71,27 +95,24 @@ export default function AlertsPage() {
       showError(`Alert escalated for priority field team dispatch.`);
     }
 
-    // If resolved, update site active alerts count
-    if (actionType === 'Mark Resolved') {
-      const updatedSiteIssues = selectedSite.issues.map(iss => iss.id === selectedIssue.id ? updatedIssue : iss);
-      const remainingActive = updatedSiteIssues.filter(i => i.status !== 'Resolved').length;
+    // Update state
+    const updatedSiteIssues = selectedSite.issues.map(iss => iss.id === selectedIssue.id ? updatedIssue : iss);
+    const remainingActive = updatedSiteIssues.filter(i => i.status !== 'Resolved').length;
 
-      const updatedSite = {
-        ...selectedSite,
-        activeAlertsCount: remainingActive,
-        hasActiveAlerts: remainingActive > 0,
-        issues: updatedSiteIssues
-      };
+    const updatedSite = {
+      ...selectedSite,
+      activeAlertsCount: remainingActive,
+      hasActiveAlerts: remainingActive > 0,
+      issues: updatedSiteIssues
+    };
 
-      setSelectedSite(updatedSite);
-      setSites(sites.map(s => s.id === updatedSite.id ? updatedSite : s));
-    }
+    setSites(sites.map(s => s.id === updatedSite.id ? updatedSite : s));
   };
 
   // Build breadcrumb items
   const breadcrumbItems = [
     { label: 'Alerts', link: '/alerts' },
-    ...(selectedSite ? [{ label: selectedSite.name, link: '/alerts' }] : []),
+    ...(selectedSite ? [{ label: selectedSite.name, link: `/alerts/${currentSiteSlug}` }] : []),
     ...(selectedIssue ? [{ label: selectedIssue.title }] : [])
   ];
 
@@ -115,12 +136,11 @@ export default function AlertsPage() {
         </div>
       </div>
 
-
       {selectedIssue ? (
         /* ISSUE FULL DETAIL VIEW */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedIssue(null)}
+            onClick={() => navigate(`/alerts/${currentSiteSlug}`)}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -283,7 +303,7 @@ export default function AlertsPage() {
         /* LIST OF ISSUE BOXES FOR SELECTED SITE */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedSite(null)}
+            onClick={() => navigate('/alerts')}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -316,7 +336,7 @@ export default function AlertsPage() {
                 {selectedSite.issues.map((issue) => (
                   <div
                     key={issue.id}
-                    onClick={() => setSelectedIssue(issue)}
+                    onClick={() => navigate(`/alerts/${currentSiteSlug}/${getIssueSlug(issue)}`)}
                     className="p-4 rounded-xl border-2 border-red-500 bg-red-50/20 hover:bg-red-50/50 transition-all cursor-pointer shadow-sm group space-y-2 card-hover"
                   >
                     <div className="flex items-center justify-between">
@@ -360,7 +380,7 @@ export default function AlertsPage() {
           {sites.map((site) => (
             <div
               key={site.id}
-              onClick={() => setSelectedSite(site)}
+              onClick={() => navigate(`/alerts/${getSiteSlug(site)}`)}
               className={`p-5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between group card-hover ${
                 site.hasActiveAlerts
                   ? 'bg-red-50/30 border-red-500 hover:bg-red-50/70 shadow-sm'

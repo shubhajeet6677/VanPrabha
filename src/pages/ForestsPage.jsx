@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Tooltip from '../components/Tooltip';
 import Breadcrumbs from '../components/Breadcrumbs';
@@ -36,11 +36,38 @@ import {
 export default function ForestsPage() {
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'all';
+  const { forestId, sensorId } = useParams();
+  const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
   const [forests, setForests] = useState(FORESTS_LIST);
-  const [selectedForest, setSelectedForest] = useState(null);
-  const [selectedSensor, setSelectedSensor] = useState(null);
+
+  // Helper to slugify forest names
+  const getForestSlug = (forest) => forest.name.toLowerCase().replace(/\s+/g, '-');
+
+  // Derive selected Forest and Sensor from URL params
+  const selectedForest = forestId
+    ? forests.find(f => 
+        f.id.toLowerCase() === forestId.toLowerCase() ||
+        getForestSlug(f) === forestId.toLowerCase() ||
+        f.abbr.toLowerCase() === forestId.toLowerCase() ||
+        f.name.toLowerCase().replace(/[^a-z0-9]/g, '') === forestId.toLowerCase().replace(/[^a-z0-9]/g, '')
+      )
+    : null;
+
+  const allSensorsInSelectedForest = selectedForest
+    ? [
+        ...(selectedForest.sensors.tree || []),
+        ...(selectedForest.sensors.soil || []),
+        ...(selectedForest.sensors.water || [])
+      ]
+    : [];
+
+  const selectedSensor = (selectedForest && sensorId)
+    ? allSensorsInSelectedForest.find(s => s.id.toLowerCase() === sensorId.toLowerCase())
+    : null;
+
+  const currentForestSlug = selectedForest ? getForestSlug(selectedForest) : '';
 
   // New Forest form state & validation
   const [newForestName, setNewForestName] = useState('');
@@ -105,7 +132,7 @@ export default function ForestsPage() {
     { label: 'Forests', link: '/forests' },
     ...(activeTab === 'add' ? [{ label: 'Add New Forest' }] : []),
     ...(activeTab === 'zones' ? [{ label: 'Zone Management' }] : []),
-    ...(selectedForest ? [{ label: selectedForest.name, link: '/forests' }] : []),
+    ...(selectedForest ? [{ label: selectedForest.name, link: `/forests/${currentForestSlug}` }] : []),
     ...(selectedSensor ? [{ label: selectedSensor.id }] : [])
   ];
 
@@ -141,7 +168,6 @@ export default function ForestsPage() {
           </p>
         </div>
       </div>
-
 
       {activeTab === 'add' ? (
         /* ADD NEW FOREST SUBTAB */
@@ -284,7 +310,7 @@ export default function ForestsPage() {
         /* FULL SENSOR DETAIL PAGE VIEW */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedSensor(null)}
+            onClick={() => navigate(`/forests/${currentForestSlug}`)}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -386,7 +412,7 @@ export default function ForestsPage() {
         /* FOREST SENSORS DETAIL VIEW (Tree 🌳, Soil 🌱, Water 💧) */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedForest(null)}
+            onClick={() => navigate('/forests')}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -418,7 +444,7 @@ export default function ForestsPage() {
 
           {/* SECTION 1: 🌳 Tree Sensors */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-            <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+            <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
               🌳 Tree Sensors ({selectedForest.abbr}TA1 — {selectedForest.abbr}TA4)
             </h3>
             
@@ -426,7 +452,7 @@ export default function ForestsPage() {
               {selectedForest.sensors.tree.map((sensor) => (
                 <div
                   key={sensor.id}
-                  onClick={() => setSelectedSensor(sensor)}
+                  onClick={() => navigate(`/forests/${currentForestSlug}/${sensor.id}`)}
                   className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
@@ -466,7 +492,7 @@ export default function ForestsPage() {
 
           {/* SECTION 2: 🌱 Soil Sensors */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-            <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+            <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
               🌱 Soil Sensors ({selectedForest.abbr}SA1 — {selectedForest.abbr}SA4)
             </h3>
             
@@ -474,7 +500,7 @@ export default function ForestsPage() {
               {selectedForest.sensors.soil.map((sensor) => (
                 <div
                   key={sensor.id}
-                  onClick={() => setSelectedSensor(sensor)}
+                  onClick={() => navigate(`/forests/${currentForestSlug}/${sensor.id}`)}
                   className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
@@ -514,7 +540,7 @@ export default function ForestsPage() {
 
           {/* SECTION 3: 💧 Water Sensors */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-            <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+            <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
               💧 Water Sensors ({selectedForest.abbr}WA1 — {selectedForest.abbr}WA4)
             </h3>
             
@@ -522,7 +548,7 @@ export default function ForestsPage() {
               {selectedForest.sensors.water.map((sensor) => (
                 <div
                   key={sensor.id}
-                  onClick={() => setSelectedSensor(sensor)}
+                  onClick={() => navigate(`/forests/${currentForestSlug}/${sensor.id}`)}
                   className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
@@ -566,7 +592,7 @@ export default function ForestsPage() {
           {forests.map((forest) => (
             <div
               key={forest.id}
-              onClick={() => setSelectedForest(forest)}
+              onClick={() => navigate(`/forests/${getForestSlug(forest)}`)}
               className="bg-white p-5 rounded-xl border border-slate-200 hover:border-[#2D6A4F] shadow-sm transition-all cursor-pointer flex flex-col justify-between group card-hover"
             >
               <div>

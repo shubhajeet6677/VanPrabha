@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Tooltip from '../components/Tooltip';
 import Breadcrumbs from '../components/Breadcrumbs';
@@ -38,11 +38,39 @@ import {
 export default function ParksPage() {
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'all';
+  const { parkId, sensorId } = useParams();
+  const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
   const [parks, setParks] = useState(PARKS_LIST);
-  const [selectedPark, setSelectedPark] = useState(null);
-  const [selectedSensor, setSelectedSensor] = useState(null);
+
+  // Helper to slugify park names
+  const getParkSlug = (park) => park.name.toLowerCase().replace(/\s+/g, '-');
+
+  // Derive selected Park and Sensor from URL params
+  const selectedPark = parkId
+    ? parks.find(p => 
+        p.id.toLowerCase() === parkId.toLowerCase() ||
+        getParkSlug(p) === parkId.toLowerCase() ||
+        p.abbr.toLowerCase() === parkId.toLowerCase() ||
+        p.name.toLowerCase().replace(/[^a-z0-9]/g, '') === parkId.toLowerCase().replace(/[^a-z0-9]/g, '')
+      )
+    : null;
+
+  const allSensorsInSelectedPark = selectedPark
+    ? [
+        ...(selectedPark.sensors.tree || []),
+        ...(selectedPark.sensors.soil || []),
+        ...(selectedPark.sensors.water || []),
+        ...(selectedPark.sensors.ambient || [])
+      ]
+    : [];
+
+  const selectedSensor = (selectedPark && sensorId)
+    ? allSensorsInSelectedPark.find(s => s.id.toLowerCase() === sensorId.toLowerCase())
+    : null;
+
+  const currentParkSlug = selectedPark ? getParkSlug(selectedPark) : '';
 
   // New Park form state & validation
   const [newParkName, setNewParkName] = useState('');
@@ -113,7 +141,7 @@ export default function ParksPage() {
     { label: 'Parks', link: '/parks' },
     ...(activeTab === 'add' ? [{ label: 'Add New Park' }] : []),
     ...(activeTab === 'zones' ? [{ label: 'Zone Management' }] : []),
-    ...(selectedPark ? [{ label: selectedPark.name, link: '/parks' }] : []),
+    ...(selectedPark ? [{ label: selectedPark.name, link: `/parks/${currentParkSlug}` }] : []),
     ...(selectedSensor ? [{ label: selectedSensor.id }] : [])
   ];
 
@@ -156,7 +184,6 @@ export default function ParksPage() {
           </p>
         </div>
       </div>
-
 
       {/* Subtab View Handler */}
       {activeTab === 'add' ? (
@@ -300,7 +327,7 @@ export default function ParksPage() {
         /* FULL SENSOR DETAIL PAGE VIEW */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedSensor(null)}
+            onClick={() => navigate(`/parks/${currentParkSlug}`)}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -412,7 +439,7 @@ export default function ParksPage() {
         /* PARK SENSORS DETAIL VIEW (Tree 🌳, Soil 🌱, Water 💧, Ambient 🌤️) */
         <div className="space-y-6">
           <button
-            onClick={() => setSelectedPark(null)}
+            onClick={() => navigate('/parks')}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -444,7 +471,7 @@ export default function ParksPage() {
 
           {/* SECTION 1: 🌳 Tree Sensors */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-            <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+            <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
               🌳 Tree Sensors ({selectedPark.abbr}TA1 — {selectedPark.abbr}TA4)
             </h3>
             
@@ -452,7 +479,7 @@ export default function ParksPage() {
               {selectedPark.sensors.tree.map((sensor) => (
                 <div
                   key={sensor.id}
-                  onClick={() => setSelectedSensor(sensor)}
+                  onClick={() => navigate(`/parks/${currentParkSlug}/${sensor.id}`)}
                   className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
@@ -492,7 +519,7 @@ export default function ParksPage() {
 
           {/* SECTION 2: 🌱 Soil Sensors */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-            <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+            <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
               🌱 Soil Sensors ({selectedPark.abbr}SA1 — {selectedPark.abbr}SA4)
             </h3>
             
@@ -500,7 +527,7 @@ export default function ParksPage() {
               {selectedPark.sensors.soil.map((sensor) => (
                 <div
                   key={sensor.id}
-                  onClick={() => setSelectedSensor(sensor)}
+                  onClick={() => navigate(`/parks/${currentParkSlug}/${sensor.id}`)}
                   className={`p-4 rounded-lg border transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover ${
                     sensor.isAlert 
                       ? 'bg-red-50/60 border-2 border-red-500 hover:bg-red-50' 
@@ -554,7 +581,7 @@ export default function ParksPage() {
 
           {/* SECTION 3: 💧 Water Sensors */}
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-            <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+            <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
               💧 Water Sensors ({selectedPark.abbr}WA1 — {selectedPark.abbr}WA4)
             </h3>
             
@@ -562,7 +589,7 @@ export default function ParksPage() {
               {selectedPark.sensors.water.map((sensor) => (
                 <div
                   key={sensor.id}
-                  onClick={() => setSelectedSensor(sensor)}
+                  onClick={() => navigate(`/parks/${currentParkSlug}/${sensor.id}`)}
                   className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
@@ -603,7 +630,7 @@ export default function ParksPage() {
           {/* SECTION 4: 🌤️ Ambient Sensors */}
           {selectedPark.sensors.ambient && (
             <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
-              <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
+              <h3 className="sticky top-16 z-10 bg-[#1B4332] text-white p-3 rounded-lg shadow-md text-sm font-bold flex items-center gap-2 border-b border-emerald-800">
                 🌤️ Ambient Weather Stations (Main Gate, North Trail, Picnic Zone, East Entrance)
               </h3>
               
@@ -611,7 +638,7 @@ export default function ParksPage() {
                 {selectedPark.sensors.ambient.map((sensor) => (
                   <div
                     key={sensor.id}
-                    onClick={() => setSelectedSensor(sensor)}
+                    onClick={() => navigate(`/parks/${currentParkSlug}/${sensor.id}`)}
                     className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                   >
                     <div>
@@ -655,7 +682,7 @@ export default function ParksPage() {
           {parks.map((park) => (
             <div
               key={park.id}
-              onClick={() => setSelectedPark(park)}
+              onClick={() => navigate(`/parks/${getParkSlug(park)}`)}
               className="bg-white p-5 rounded-xl border border-slate-200 hover:border-[#2D6A4F] shadow-sm transition-all cursor-pointer flex flex-col justify-between group card-hover"
             >
               <div>

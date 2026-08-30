@@ -44,9 +44,41 @@ export default function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/parks/:parkId" 
+              element={
+                <ProtectedRoute>
+                  <ParksPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/parks/:parkId/:sensorId" 
+              element={
+                <ProtectedRoute>
+                  <ParksPage />
+                </ProtectedRoute>
+              } 
+            />
 
             <Route 
               path="/forests" 
+              element={
+                <ProtectedRoute>
+                  <ForestsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/forests/:forestId" 
+              element={
+                <ProtectedRoute>
+                  <ForestsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/forests/:forestId/:sensorId" 
               element={
                 <ProtectedRoute>
                   <ForestsPage />
@@ -62,9 +94,16 @@ export default function App() {
                 </ProtectedRoute>
               } 
             />
-
             <Route 
               path="/litter/:subTab" 
+              element={
+                <ProtectedRoute>
+                  <LitterDetectionPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/litter/:siteId/:cameraId" 
               element={
                 <ProtectedRoute>
                   <LitterDetectionPage />
@@ -74,6 +113,22 @@ export default function App() {
 
             <Route 
               path="/alerts" 
+              element={
+                <ProtectedRoute>
+                  <AlertsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/alerts/:siteId" 
+              element={
+                <ProtectedRoute>
+                  <AlertsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/alerts/:siteId/:issueId" 
               element={
                 <ProtectedRoute>
                   <AlertsPage />

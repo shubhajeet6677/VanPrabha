@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -10,24 +10,38 @@ import {
   Bell, 
   ChevronDown, 
   ChevronRight, 
+  ChevronLeft,
   LogOut, 
   User,
   PlusCircle,
   Map,
   Camera,
   History,
-  Activity
+  Activity,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 
-export default function Sidebar({ isOpen, setIsOpen }) {
+export default function Sidebar({ isOpen, setIsOpen, isCollapsed, toggleCollapse }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout } = useAuth();
 
-  // Submenu open states
+  // Submenu open states (Initialized and maintained based on active route)
   const [parksOpen, setParksOpen] = useState(location.pathname.startsWith('/parks'));
   const [forestsOpen, setForestsOpen] = useState(location.pathname.startsWith('/forests'));
   const [litterOpen, setLitterOpen] = useState(location.pathname.startsWith('/litter'));
+
+  // Ensure active parent section stays expanded whenever route changes deep into a section
+  useEffect(() => {
+    if (location.pathname.startsWith('/parks')) {
+      setParksOpen(true);
+    } else if (location.pathname.startsWith('/forests')) {
+      setForestsOpen(true);
+    } else if (location.pathname.startsWith('/litter')) {
+      setLitterOpen(true);
+    }
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -38,35 +52,55 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
   return (
     <aside 
-      className={`fixed top-0 left-0 z-40 h-screen w-64 bg-[#1B4332] text-white flex flex-col justify-between border-r border-emerald-900 shadow-lg transition-transform duration-300 ${
+      className={`fixed top-0 left-0 z-40 h-screen bg-[#1B4332] text-white flex flex-col justify-between border-r border-emerald-900 shadow-lg transition-all duration-300 ${
+        isCollapsed ? 'w-64 lg:w-20' : 'w-64'
+      } ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
     >
       <div>
         {/* Brand Header */}
-        <div className="h-16 px-5 border-b border-emerald-800/80 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-[#2D6A4F] text-white flex items-center justify-center border border-emerald-600/30">
-            <Trees className="w-5 h-5" />
+        <div className="h-16 px-4 border-b border-emerald-800/80 flex items-center justify-between">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="w-9 h-9 rounded-md bg-[#2D6A4F] text-white flex items-center justify-center border border-emerald-600/30 shrink-0">
+              <Trees className="w-5 h-5" />
+            </div>
+            {!isCollapsed && (
+              <div className="truncate">
+                <h1 className="font-bold text-base text-white tracking-tight leading-tight">
+                  VanPrabha
+                </h1>
+                <p className="text-[10px] text-emerald-200/80 font-medium">
+                  Urban Forest Operations
+                </p>
+              </div>
+            )}
           </div>
-          <div>
-            <h1 className="font-bold text-base text-white tracking-tight leading-tight">
-              VanPrabha
-            </h1>
-            <p className="text-[10px] text-emerald-200/80 font-medium">
-              Urban Forest Operations
-            </p>
-          </div>
+
+          {/* Desktop Sidebar Collapse Toggle */}
+          <button
+            onClick={toggleCollapse}
+            title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            className="hidden lg:flex p-1.5 rounded-md hover:bg-emerald-800/60 text-emerald-300 hover:text-white transition-colors cursor-pointer"
+          >
+            {isCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4" />
+            )}
+          </button>
         </div>
 
         {/* Navigation Items */}
-        <nav className="p-4 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
+        <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
           
           {/* Dashboard */}
           <button
             onClick={() => navigate('/dashboard')}
-            className={`relative overflow-hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
+            title="Dashboard"
+            className={`relative overflow-hidden w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'gap-3 px-3'} py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
               isActive('/dashboard') 
-                ? 'bg-[#2D6A4F] text-white shadow-sm pl-4' 
+                ? 'bg-[#2D6A4F] text-white shadow-sm' 
                 : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
             }`}
           >
@@ -76,7 +110,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               }`}
             />
             <LayoutDashboard className="w-4 h-4 text-emerald-300 shrink-0" />
-            Dashboard
+            {!isCollapsed && <span>Dashboard</span>}
           </button>
 
           {/* PARKS SECTION */}
@@ -88,9 +122,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   navigate('/parks');
                 }
               }}
-              className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
+              title="Parks"
+              className={`relative overflow-hidden w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'justify-between px-3'} py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
                 location.pathname.startsWith('/parks')
-                  ? 'bg-emerald-900/80 text-white pl-4'
+                  ? 'bg-emerald-900/80 text-white'
                   : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
               }`}
             >
@@ -101,17 +136,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               />
               <div className="flex items-center gap-3">
                 <TreePine className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span>Parks</span>
+                {!isCollapsed && <span>Parks</span>}
               </div>
-              {parksOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-emerald-300" />
-              ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+              {!isCollapsed && (
+                parksOpen ? (
+                  <ChevronDown className="w-3.5 h-3.5 text-emerald-300" />
+                ) : (
+                  <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+                )
               )}
             </button>
 
             {/* Parks Suboptions */}
-            {parksOpen && (
+            {parksOpen && !isCollapsed && (
               <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
                 <button
                   onClick={() => navigate('/parks')}
@@ -168,9 +205,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   navigate('/forests');
                 }
               }}
-              className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
+              title="Forests"
+              className={`relative overflow-hidden w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'justify-between px-3'} py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
                 location.pathname.startsWith('/forests')
-                  ? 'bg-emerald-900/80 text-white pl-4'
+                  ? 'bg-emerald-900/80 text-white'
                   : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
               }`}
             >
@@ -181,17 +219,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               />
               <div className="flex items-center gap-3">
                 <ForestIcon className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span>Forests</span>
+                {!isCollapsed && <span>Forests</span>}
               </div>
-              {forestsOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-emerald-300" />
-              ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+              {!isCollapsed && (
+                forestsOpen ? (
+                  <ChevronDown className="w-3.5 h-3.5 text-emerald-300" />
+                ) : (
+                  <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+                )
               )}
             </button>
 
             {/* Forests Suboptions */}
-            {forestsOpen && (
+            {forestsOpen && !isCollapsed && (
               <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
                 <button
                   onClick={() => navigate('/forests')}
@@ -248,9 +288,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   navigate('/litter/live');
                 }
               }}
-              className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
+              title="Litter Detection"
+              className={`relative overflow-hidden w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'justify-between px-3'} py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
                 location.pathname.startsWith('/litter')
-                  ? 'bg-emerald-900/80 text-white pl-4'
+                  ? 'bg-emerald-900/80 text-white'
                   : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
               }`}
             >
@@ -261,17 +302,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               />
               <div className="flex items-center gap-3">
                 <Trash2 className="w-4 h-4 text-emerald-300 shrink-0" />
-                <span>Litter Detection</span>
+                {!isCollapsed && <span>Litter Detection</span>}
               </div>
-              {litterOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-emerald-300" />
-              ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+              {!isCollapsed && (
+                litterOpen ? (
+                  <ChevronDown className="w-3.5 h-3.5 text-emerald-300" />
+                ) : (
+                  <ChevronRight className="w-3.5 h-3.5 text-emerald-400" />
+                )
               )}
             </button>
 
             {/* Litter Detection Suboptions */}
-            {litterOpen && (
+            {litterOpen && !isCollapsed && (
               <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
                 <button
                   onClick={() => navigate('/litter/live')}
@@ -336,51 +379,57 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           {/* ALERTS SECTION */}
           <button
             onClick={() => navigate('/alerts')}
-            className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
-              isActive('/alerts') 
-                ? 'bg-[#2D6A4F] text-white shadow-sm pl-4' 
+            title="Alerts"
+            className={`relative overflow-hidden w-full flex items-center ${isCollapsed ? 'justify-center px-2' : 'justify-between px-3'} py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
+              location.pathname.startsWith('/alerts')
+                ? 'bg-[#2D6A4F] text-white shadow-sm' 
                 : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
             }`}
           >
             <span 
               className={`absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
-                isActive('/alerts') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                location.pathname.startsWith('/alerts') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
               }`}
             />
             <div className="flex items-center gap-3">
               <Bell className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Alerts</span>
+              {!isCollapsed && <span>Alerts</span>}
             </div>
-            <span className="bg-[#E63946] text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm animate-alert-pulse">
-              5 Active
-            </span>
+            {!isCollapsed && (
+              <span className="bg-[#E63946] text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm animate-alert-pulse">
+                5 Active
+              </span>
+            )}
           </button>
 
         </nav>
       </div>
 
       {/* Officer Profile & Logout */}
-      <div className="p-4 border-t border-emerald-800/80 bg-emerald-950/40 space-y-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-[#2D6A4F] border border-emerald-600 flex items-center justify-center text-white font-bold text-xs">
+      <div className="p-3 border-t border-emerald-800/80 bg-emerald-950/40 space-y-3">
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'}`}>
+          <div className="w-8 h-8 rounded-full bg-[#2D6A4F] border border-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
             {currentUser?.fullName ? currentUser.fullName[0].toUpperCase() : <User className="w-4 h-4" />}
           </div>
-          <div className="overflow-hidden">
-            <h4 className="text-xs font-bold text-white truncate leading-tight">
-              {currentUser?.fullName || 'Officer'}
-            </h4>
-            <p className="text-[10px] text-emerald-300 truncate">
-              {currentUser?.role || 'System Admin'} ({currentUser?.officerId || 'VP-001'})
-            </p>
-          </div>
+          {!isCollapsed && (
+            <div className="overflow-hidden">
+              <h4 className="text-xs font-bold text-white truncate leading-tight">
+                {currentUser?.fullName || 'Officer'}
+              </h4>
+              <p className="text-[10px] text-emerald-300 truncate">
+                {currentUser?.role || 'System Admin'} ({currentUser?.officerId || 'VP-001'})
+              </p>
+            </div>
+          )}
         </div>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-1.5 px-3 rounded bg-emerald-900/80 hover:bg-red-900/80 text-xs font-semibold text-emerald-100 hover:text-white border border-emerald-700/60 hover:border-red-700 transition-colors cursor-pointer"
+          title="Logout"
+          className={`w-full flex items-center justify-center gap-2 py-1.5 ${isCollapsed ? 'px-2' : 'px-3'} rounded bg-emerald-900/80 hover:bg-red-900/80 text-xs font-semibold text-emerald-100 hover:text-white border border-emerald-700/60 hover:border-red-700 transition-colors cursor-pointer`}
         >
-          <LogOut className="w-3.5 h-3.5" />
-          Logout
+          <LogOut className="w-3.5 h-3.5 shrink-0" />
+          {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
     </aside>
