@@ -1,11 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, googleProvider } from '../lib/firebase';
-import { 
-  signInWithEmailAndPassword, 
-  signInWithPopup, 
-  onAuthStateChanged,
-  signOut
-} from 'firebase/auth';
+import React, { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
 
@@ -14,61 +7,55 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userRole, setUserRole] = useState(null); // 'admin' or 'field_staff'
-
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
-  }
-
-  function loginWithGoogle() {
-    return signInWithPopup(auth, googleProvider);
-  }
-
-  function logout() {
-    return signOut(auth);
-  }
-
-  // Since we are using mock data for roles, we assign roles based on email or randomly for demo.
-  function assignMockRole(email) {
-    if (email && email.includes('admin')) {
-      return 'admin';
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vanprabha_officer');
+      return saved ? JSON.parse(saved) : {
+        fullName: 'Vikram Singh',
+        officerId: 'VP-DG-001',
+        division: 'North',
+        zone: 'North Zone 1',
+        role: 'Director General'
+      };
+    } catch {
+      return {
+        fullName: 'Vikram Singh',
+        officerId: 'VP-DG-001',
+        division: 'North',
+        zone: 'North Zone 1',
+        role: 'Director General'
+      };
     }
-    return 'field_staff';
-  }
+  });
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      if (user) {
-        setUserRole(assignMockRole(user.email));
-      } else {
-        setUserRole(null);
-      }
-      setLoading(false);
-    });
+  const loginOfficer = (officerData) => {
+    setCurrentUser(officerData);
+    try {
+      localStorage.setItem('vanprabha_officer', JSON.stringify(officerData));
+    } catch (e) {
+      console.error("Storage error", e);
+    }
+  };
 
-    return unsubscribe;
-  }, []);
+  const logout = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('vanprabha_officer');
+    } catch (e) {
+      console.error("Storage clear error", e);
+    }
+  };
 
   const value = {
     currentUser,
-    userRole,
-    login,
-    loginWithGoogle,
-    logout,
-    // Add a mock login for demo purposes without actual Firebase credentials
-    mockLogin: (role) => {
-      setCurrentUser({ email: `demo@${role}.com`, uid: 'mock-uid-123' });
-      setUserRole(role);
-      setLoading(false);
-    }
+    userRole: currentUser?.role || 'Director General',
+    loginOfficer,
+    logout
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

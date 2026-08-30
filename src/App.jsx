@@ -3,22 +3,16 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import SiteExplorer from './pages/SiteExplorer';
+import ParksPage from './pages/ParksPage';
+import ForestsPage from './pages/ForestsPage';
+import LitterDetectionPage from './pages/LitterDetectionPage';
+import AlertsPage from './pages/AlertsPage';
 
-function ProtectedRoute({ children, allowedRole }) {
-  const { currentUser, userRole } = useAuth();
+function ProtectedRoute({ children }) {
+  const { currentUser } = useAuth();
 
   if (!currentUser) {
     return <Navigate to="/login" replace />;
-  }
-
-  // If a role requirement is specified and doesn't match, redirect appropriately
-  if (allowedRole && userRole && userRole !== allowedRole) {
-    if (userRole === 'admin') {
-      return <Navigate to="/dashboard" replace />;
-    } else {
-      return <Navigate to="/site/park-1" replace />;
-    }
   }
 
   return children;
@@ -34,17 +28,53 @@ export default function App() {
           <Route 
             path="/dashboard" 
             element={
-              <ProtectedRoute allowedRole="admin">
+              <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
             } 
           />
 
           <Route 
-            path="/site/:siteId" 
+            path="/parks" 
             element={
               <ProtectedRoute>
-                <SiteExplorer />
+                <ParksPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/forests" 
+            element={
+              <ProtectedRoute>
+                <ForestsPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/litter" 
+            element={
+              <ProtectedRoute>
+                <LitterDetectionPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/litter/:subTab" 
+            element={
+              <ProtectedRoute>
+                <LitterDetectionPage />
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route 
+            path="/alerts" 
+            element={
+              <ProtectedRoute>
+                <AlertsPage />
               </ProtectedRoute>
             } 
           />
