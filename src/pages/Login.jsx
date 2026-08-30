@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { Trees, ShieldCheck, ArrowRight, Check, AlertCircle } from 'lucide-react';
+import { Trees, Eye, EyeOff, X, AlertCircle } from 'lucide-react';
 import { DIVISIONS, DIVISION_ZONES, ROLES, OFFICERS } from '../data/mockData';
 
 export default function Login() {
   const { loginOfficer } = useAuth();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess } = useToast();
   const navigate = useNavigate();
 
   const [division, setDivision] = useState(DIVISIONS[0]);
@@ -16,10 +16,10 @@ export default function Login() {
   const [fullName, setFullName] = useState('');
   const [officerId, setOfficerId] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorBanner, setErrorBanner] = useState('');
   const [formTouched, setFormTouched] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
-  const [capsLockOff, setCapsLockOff] = useState(false);
 
   const handleDivisionChange = (e) => {
     const selectedDiv = e.target.value;
@@ -90,13 +90,11 @@ export default function Login() {
     const formatted = formatOfficerId(rawVal);
     setOfficerId(formatted);
 
-    // Auto detect role
     const detectedRole = detectRoleFromPrefix(formatted);
     if (detectedRole) {
       setRole(detectedRole);
     }
 
-    // Match exact officer in mock dataset if present
     const matched = OFFICERS.find(o => o.id.toLowerCase() === formatted.trim().toLowerCase());
     if (matched) {
       setFullName(matched.name);
@@ -111,11 +109,9 @@ export default function Login() {
     }
   };
 
-  const handleKeyCapsCheck = (e) => {
-    if (typeof e.getModifierState === 'function') {
-      const isCapsOn = e.getModifierState('CapsLock');
-      setCapsLockOff(!isCapsOn);
-    }
+  const isIdFormatValid = (id) => {
+    if (!id) return true;
+    return /^VP-(DG|DC|ZC|CS|FW|LI|ADM|ADC)-\d{3}$/.test(id.trim());
   };
 
   const handleSubmit = (e) => {
@@ -125,22 +121,17 @@ export default function Login() {
     const formattedId = officerId.trim();
 
     if (!fullName.trim() || !formattedId || !password.trim()) {
-      const errMsg = 'Please fill in all required officer credentials.';
-      setError(errMsg);
-      showError(errMsg);
+      setErrorBanner('Incorrect credentials. Please try again.');
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       return;
     }
 
-    // Check if officer ID exists or follows standard pattern
     const officerMatch = OFFICERS.find(o => o.id.toLowerCase() === formattedId.toLowerCase());
-    const isValidFormat = /^VP-(DG|DC|ZC|CS|FW|LI|ADM|ADC)-\d{3}$/.test(formattedId);
+    const isValidFormat = isIdFormatValid(formattedId);
 
     if (!officerMatch && !isValidFormat) {
-      const helpfulErr = 'Officer ID not found. Your ID should look like VP-FW-001. Check your role prefix and try again.';
-      setError(helpfulErr);
-      showError(helpfulErr);
+      setErrorBanner('Incorrect credentials. Please try again.');
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 500);
       return;
@@ -154,199 +145,244 @@ export default function Login() {
       officerId: formattedId
     };
 
-    setError('');
+    setErrorBanner('');
     loginOfficer(officerData);
-    showSuccess(`Welcome back, Officer ${officerData.fullName}! Access granted.`);
+    showSuccess(`Welcome back, ${officerData.fullName}! Access granted.`);
     navigate('/dashboard');
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex flex-col justify-center items-center px-4 py-10 font-sans">
-      <div className={`w-full max-w-md bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm ${isShaking ? 'animate-shake' : ''}`}>
+    <div className="min-h-screen bg-[#2D6A4F] flex items-center justify-center p-4 sm:p-6 font-sans">
+      {/* Outer Centered Card */}
+      <div 
+        className={`w-[95%] lg:w-[85%] max-w-[1150px] min-h-[640px] max-h-[860px] bg-[#FAFAF8] rounded-[20px] shadow-2xl overflow-hidden flex flex-col md:flex-row animate-card-appear ${
+          isShaking ? 'animate-shake' : ''
+        }`}
+      >
         
-        {/* Header Branding */}
-        <div className="text-center mb-6">
-          <div className="inline-flex p-3 rounded-lg bg-[#1B4332] text-white mb-3 shadow-sm">
-            <Trees className="w-8 h-8 text-emerald-400" />
+        {/* LEFT COLUMN (45% width on desktop, hidden on mobile) */}
+        <div className="hidden md:flex md:w-[45%] relative bg-cover bg-center rounded-l-[20px] overflow-hidden flex-col justify-between p-8 text-white select-none"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1511497584788-876761c13906?q=80&w=1200&auto=format&fit=crop')`
+          }}
+        >
+          {/* Dark Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 pointer-events-none" />
+
+          {/* Top Left Branding */}
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-emerald-700/80 backdrop-blur-md border border-emerald-400/40 flex items-center justify-center text-white shadow-sm">
+              <Trees className="w-5 h-5" />
+            </div>
+            <span className="text-lg font-bold tracking-tight text-white">VanPrabha</span>
           </div>
-          <h1 className="text-2xl font-bold text-[#1B4332] tracking-tight">
-            VanPrabha
-          </h1>
-          <p className="text-xs font-semibold text-[#2D6A4F] mt-1">
-            "The Glow of Living Forests"
-          </p>
-          <p className="text-xs text-slate-500 mt-1">
-            Urban Forest Operations & Administration Portal
-          </p>
+
+          {/* Bottom Content & Indicator Dots */}
+          <div className="relative z-10 space-y-6">
+            <div>
+              <h2 className="text-[22px] font-bold text-white leading-snug tracking-tight">
+                Protecting Forests,
+              </h2>
+              <h2 className="text-[22px] font-bold text-white leading-snug tracking-tight">
+                One Sensor at a Time
+              </h2>
+            </div>
+
+            {/* Slide Indicator Dots */}
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-white/40 transition-opacity" />
+              <span className="w-2.5 h-2.5 rounded-full bg-white/40 transition-opacity" />
+              <span className="w-2.5 h-2.5 rounded-full bg-white transition-opacity shadow-sm" />
+            </div>
+          </div>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 text-xs font-medium rounded-md text-left flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Form with exact required fields in order */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* RIGHT COLUMN (55% width on desktop, 100% on mobile) */}
+        <div className="w-full md:w-[55%] bg-[#FAFAF8] p-6 sm:p-10 lg:p-12 flex flex-col justify-center overflow-y-auto">
           
-          {/* 1. Division Dropdown */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              1. Division
-            </label>
-            <select
-              value={division}
-              onChange={handleDivisionChange}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-md text-xs font-medium text-slate-900 focus:outline-none"
-            >
-              {DIVISIONS.map((div) => (
-                <option key={div} value={div}>
-                  {div} Division
-                </option>
-              ))}
-            </select>
+          {/* Mobile Header Branding */}
+          <div className="md:hidden flex items-center gap-2.5 mb-6">
+            <div className="w-8 h-8 rounded-md bg-[#1B4332] text-white flex items-center justify-center">
+              <Trees className="w-4 h-4 text-emerald-400" />
+            </div>
+            <span className="text-base font-bold text-[#1B4332]">VanPrabha</span>
           </div>
 
-          {/* 2. Zone Dropdown */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              2. Zone
-            </label>
-            <select
-              value={zone}
-              onChange={(e) => setZone(e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-md text-xs font-medium text-slate-900 focus:outline-none"
-            >
-              {DIVISION_ZONES[division].map((z) => (
-                <option key={z} value={z}>
-                  {z}
-                </option>
-              ))}
-            </select>
+          {/* Header Texts */}
+          <div className="mb-7">
+            <h1 className="text-[30px] font-bold text-[#1B4332] tracking-tight leading-tight">
+              Welcome Back
+            </h1>
+            <p className="text-[14px] text-[#6B7280] mt-1 font-normal">
+              Sign in to your VanPrabha account
+            </p>
           </div>
 
-          {/* 3. Role Dropdown */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              3. Role
-            </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-md text-xs font-medium text-slate-900 focus:outline-none"
-            >
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* 4. Full Name */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
-              <span>4. Full Name *</span>
-              {fullName.trim() ? (
-                <span className="text-emerald-600 text-[11px] font-semibold flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Valid
-                </span>
-              ) : formTouched ? (
-                <span className="text-red-500 text-[11px] font-semibold">This field is required</span>
-              ) : null}
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Rajiv Menon"
-              className={`w-full px-3 py-2.5 text-xs font-medium bg-slate-50 border rounded-md focus:outline-none transition-colors ${
-                formTouched && !fullName.trim()
-                  ? 'border-red-500 bg-red-50/30'
-                  : fullName.trim()
-                  ? 'border-emerald-500 bg-emerald-50/20'
-                  : 'border-slate-300'
-              }`}
-            />
-          </div>
-
-          {/* 5. Officer ID */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
-              <span>5. Officer ID *</span>
-              {officerId.trim() ? (
-                <span className="text-emerald-600 text-[11px] font-semibold flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Valid
-                </span>
-              ) : formTouched ? (
-                <span className="text-red-500 text-[11px] font-semibold">This field is required</span>
-              ) : (
-                <span className="text-[10px] text-slate-400 font-normal">e.g. VP-FW-001</span>
-              )}
-            </label>
-            <input
-              type="text"
-              value={officerId}
-              onChange={handleOfficerIdChange}
-              onKeyDown={handleKeyCapsCheck}
-              onKeyUp={handleKeyCapsCheck}
-              placeholder="VP-FW-001"
-              className={`w-full px-3 py-2.5 text-xs font-medium font-mono bg-slate-50 border rounded-md focus:outline-none transition-colors uppercase ${
-                formTouched && !officerId.trim()
-                  ? 'border-red-500 bg-red-50/30'
-                  : officerId.trim()
-                  ? 'border-emerald-500 bg-emerald-50/20'
-                  : 'border-slate-300'
-              }`}
-            />
-            {capsLockOff && officerId.length > 0 && (
-              <div className="text-amber-600 text-[11px] font-semibold mt-1 flex items-center gap-1">
-                ⚠️ Caps Lock is off — IDs are uppercase
+          {/* Failed Login Error Banner */}
+          {errorBanner && (
+            <div className="mb-6 p-3.5 bg-red-50 border border-red-200 text-red-800 text-xs font-medium rounded-lg flex items-center justify-between animate-page-fade">
+              <div className="flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>{errorBanner}</span>
               </div>
-            )}
-          </div>
+              <button 
+                onClick={() => setErrorBanner('')}
+                className="text-red-500 hover:text-red-800 p-1 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
-          {/* 6. Password (Masked) */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
-              <span>6. Password *</span>
-              {password.trim() ? (
-                <span className="text-emerald-600 text-[11px] font-semibold flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Valid
-                </span>
-              ) : formTouched ? (
-                <span className="text-red-500 text-[11px] font-semibold">This field is required</span>
+          {/* Staggered Animated Form Fields */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {/* Field 1: Division Dropdown */}
+            <div className="animate-stagger-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Division
+              </label>
+              <select
+                value={division}
+                onChange={handleDivisionChange}
+                className="w-full px-4 py-[14px] text-[14px] bg-[#F3F4F6] border border-[#E5E7EB] rounded-[10px] text-slate-900 font-medium focus:outline-none focus:border-[#52B788] focus:ring-3 focus:ring-[#52B788]/15 transition-all duration-150 cursor-pointer"
+              >
+                {DIVISIONS.map((div) => (
+                  <option key={div} value={div}>
+                    {div} Division
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Field 2: Zone Dropdown */}
+            <div className="animate-stagger-2">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Zone
+              </label>
+              <select
+                value={zone}
+                onChange={(e) => setZone(e.target.value)}
+                className="w-full px-4 py-[14px] text-[14px] bg-[#F3F4F6] border border-[#E5E7EB] rounded-[10px] text-slate-900 font-medium focus:outline-none focus:border-[#52B788] focus:ring-3 focus:ring-[#52B788]/15 transition-all duration-150 cursor-pointer"
+              >
+                {DIVISION_ZONES[division].map((z) => (
+                  <option key={z} value={z}>
+                    {z}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Field 3: Role Dropdown */}
+            <div className="animate-stagger-3">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full px-4 py-[14px] text-[14px] bg-[#F3F4F6] border border-[#E5E7EB] rounded-[10px] text-slate-900 font-medium focus:outline-none focus:border-[#52B788] focus:ring-3 focus:ring-[#52B788]/15 transition-all duration-150 cursor-pointer"
+              >
+                {ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Field 4: Full Name */}
+            <div className="animate-stagger-4">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="e.g. Rajiv Menon"
+                className={`w-full px-4 py-[14px] text-[14px] bg-[#F3F4F6] border rounded-[10px] text-slate-900 font-medium focus:outline-none focus:border-[#52B788] focus:ring-3 focus:ring-[#52B788]/15 transition-all duration-150 ${
+                  formTouched && !fullName.trim() ? 'border-red-500 bg-red-50/20' : 'border-[#E5E7EB]'
+                }`}
+              />
+              {formTouched && !fullName.trim() && (
+                <span className="text-red-500 text-[11px] font-medium mt-1 block">Required</span>
+              )}
+            </div>
+
+            {/* Field 5: Officer ID */}
+            <div className="animate-stagger-5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Officer ID
+              </label>
+              <input
+                type="text"
+                value={officerId}
+                onChange={handleOfficerIdChange}
+                placeholder="VP-FW-001"
+                className={`w-full px-4 py-[14px] text-[14px] bg-[#F3F4F6] border rounded-[10px] text-slate-900 font-medium focus:outline-none focus:border-[#52B788] focus:ring-3 focus:ring-[#52B788]/15 transition-all duration-150 uppercase ${
+                  formTouched && (!officerId.trim() || !isIdFormatValid(officerId))
+                    ? 'border-red-500 bg-red-50/20'
+                    : 'border-[#E5E7EB]'
+                }`}
+              />
+              {formTouched && !officerId.trim() ? (
+                <span className="text-red-500 text-[11px] font-medium mt-1 block">Required</span>
+              ) : formTouched && !isIdFormatValid(officerId) ? (
+                <span className="text-red-500 text-[11px] font-medium mt-1 block">Should look like VP-FW-001</span>
               ) : null}
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••••••"
-              className={`w-full px-3 py-2.5 text-xs font-medium bg-slate-50 border rounded-md focus:outline-none transition-colors ${
-                formTouched && !password.trim()
-                  ? 'border-red-500 bg-red-50/30'
-                  : password.trim()
-                  ? 'border-emerald-500 bg-emerald-50/20'
-                  : 'border-slate-300'
-              }`}
-            />
+            </div>
+
+            {/* Field 6: Password */}
+            <div className="animate-stagger-6">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className={`w-full px-4 py-[14px] pr-11 text-[14px] bg-[#F3F4F6] border rounded-[10px] text-slate-900 font-medium focus:outline-none focus:border-[#52B788] focus:ring-3 focus:ring-[#52B788]/15 transition-all duration-150 ${
+                    formTouched && !password.trim() ? 'border-red-500 bg-red-50/20' : 'border-[#E5E7EB]'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors p-1 cursor-pointer"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {formTouched && !password.trim() && (
+                <span className="text-red-500 text-[11px] font-medium mt-1 block">Required</span>
+              )}
+            </div>
+
+            {/* Sign In Button */}
+            <div className="pt-2 animate-stagger-6">
+              <button
+                type="submit"
+                className="w-full py-[14px] bg-[#1B4332] hover:bg-[#2D6A4F] text-white font-bold text-[15px] rounded-[10px] shadow-sm hover:-translate-y-[1px] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+              >
+                Sign In
+              </button>
+            </div>
+          </form>
+
+          {/* Below Button Admin Text */}
+          <div className="mt-6 text-center">
+            <p className="text-[13px] text-[#9CA3AF]">
+              Having trouble? Contact your System Admin
+            </p>
           </div>
 
-          {/* Single Login Button */}
-          <button
-            type="submit"
-            className="w-full mt-2 py-3 bg-[#1B4332] hover:bg-emerald-900 text-white font-bold rounded-md shadow-sm text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-          >
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            Login
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
+        </div>
 
       </div>
     </div>
   );
 }
-
