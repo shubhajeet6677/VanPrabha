@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -10,7 +10,6 @@ import {
   Bell, 
   ChevronDown, 
   ChevronRight, 
-  ChevronLeft,
   LogOut, 
   User,
   PlusCircle,
@@ -22,26 +21,15 @@ import {
   PanelLeftOpen
 } from 'lucide-react';
 
-export default function Sidebar({ isOpen, setIsOpen, isCollapsed, toggleCollapse }) {
+export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout } = useAuth();
 
-  // Submenu open states (Initialized and maintained based on active route)
-  const [parksOpen, setParksOpen] = useState(location.pathname.startsWith('/parks'));
-  const [forestsOpen, setForestsOpen] = useState(location.pathname.startsWith('/forests'));
-  const [litterOpen, setLitterOpen] = useState(location.pathname.startsWith('/litter'));
-
-  // Ensure active parent section stays expanded whenever route changes deep into a section
-  useEffect(() => {
-    if (location.pathname.startsWith('/parks')) {
-      setParksOpen(true);
-    } else if (location.pathname.startsWith('/forests')) {
-      setForestsOpen(true);
-    } else if (location.pathname.startsWith('/litter')) {
-      setLitterOpen(true);
-    }
-  }, [location.pathname]);
+  // Submenu open states derived directly from location.pathname
+  const [parksOpen, setParksOpen] = useState(() => location.pathname.startsWith('/parks'));
+  const [forestsOpen, setForestsOpen] = useState(() => location.pathname.startsWith('/forests'));
+  const [litterOpen, setLitterOpen] = useState(() => location.pathname.startsWith('/litter'));
 
   const handleLogout = () => {
     logout();

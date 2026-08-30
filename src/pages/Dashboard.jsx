@@ -2,9 +2,8 @@ import React, { useState, useMemo } from 'react';
 import Layout from '../components/Layout';
 import ParkMap from '../components/ParkMap';
 import Tooltip from '../components/Tooltip';
-import { PARKS_LIST, SENSOR_SUMMARY } from '../data/mockData';
+import { PARKS_LIST } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
-import { formatRelativeTime } from '../lib/timeUtils';
 import { 
   TreePine, 
   Cpu, 
@@ -15,7 +14,6 @@ import {
   ChevronRight,
   ShieldAlert,
   CloudSun,
-  Thermometer,
   Clock,
   Sparkles
 } from 'lucide-react';
@@ -38,13 +36,7 @@ export default function Dashboard() {
     } else if (hour >= 17 && hour < 21) {
       return `Good evening, ${officerName}`;
     } else {
-      const lateGreetings = [
-        `${officerName} returns!`,
-        `Back at it, ${officerName}`,
-        `Coffee and Conservation time?`
-      ];
-      const index = Math.floor(Math.random() * lateGreetings.length);
-      return lateGreetings[index];
+      return `Welcome back, ${officerName}`;
     }
   }, [officerName]);
 

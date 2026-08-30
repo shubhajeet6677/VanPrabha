@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Sidebar from './Sidebar';
-import SkeletonLoader from './SkeletonLoader';
 import { Menu, Bell, ShieldCheck, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
@@ -11,7 +10,6 @@ export default function Layout({ children }) {
     const saved = localStorage.getItem('vanprabha_sidebar_collapsed');
     return saved ? JSON.parse(saved) : false;
   });
-  const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const location = useLocation();
 
@@ -23,22 +21,11 @@ export default function Layout({ children }) {
     });
   };
 
-  // Route change skeleton loading effect (at least 600ms duration)
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 600);
-
-    return () => clearTimeout(timer);
-  }, [location.pathname, location.search]);
-
   return (
     <div className="min-h-screen bg-[#FAFAF8] flex font-sans">
       {/* Sidebar Navigation */}
       <Sidebar 
         isOpen={sidebarOpen} 
-        setIsOpen={setSidebarOpen} 
         isCollapsed={isCollapsed}
         toggleCollapse={toggleCollapse}
       />
@@ -109,15 +96,11 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        {/* Dynamic Page Content with Fade Transition & Skeleton Load */}
+        {/* Dynamic Page Content with Fade Transition */}
         <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-          {loading ? (
-            <SkeletonLoader />
-          ) : (
-            <div key={location.pathname + location.search} className="animate-page-fade">
-              {children}
-            </div>
-          )}
+          <div key={location.pathname + location.search} className="animate-page-fade">
+            {children}
+          </div>
         </main>
       </div>
     </div>

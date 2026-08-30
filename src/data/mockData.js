@@ -1,6 +1,4 @@
 // Mock Data for VanPrabha Urban Forest Operations Platform
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
 
 export const DIVISIONS = ['North', 'South', 'East', 'West'];
 
@@ -21,38 +19,23 @@ export const ROLES = [
   'System Admin'
 ];
 
-// OFFICERS DATASET (Stored in Firestore under "officers" collection)
+// OFFICERS DATASET
 export const OFFICERS = [ 
-  { name: "Rajiv Menon", id: "VP-DG-001", role: "Director General", division: "All", zone: "All", password: "Vanprabha@001", status: "Active" }, 
-  { name: "Sunita Krishnan", id: "VP-DG-002", role: "Director General", division: "All", zone: "All", password: "Vanprabha@002", status: "Active" }, 
-  { name: "Arun Sharma", id: "VP-DC-001", role: "Division Conservator", division: "North", zone: "All", password: "Vanprabha@003", status: "Active" }, 
-  { name: "Priya Nambiar", id: "VP-DC-002", role: "Division Conservator", division: "South", zone: "All", password: "Vanprabha@004", status: "Active" }, 
-  { name: "Deepak Verma", id: "VP-ZC-001", role: "Zone Conservator", division: "North", zone: "Zone N-1", password: "Vanprabha@005", status: "Active" }, 
-  { name: "Anjali Rawat", id: "VP-ZC-002", role: "Zone Conservator", division: "East", zone: "Zone E-2", password: "Vanprabha@006", status: "Active" }, 
-  { name: "Manoj Pillai", id: "VP-CS-001", role: "Cluster Supervisor", division: "North", zone: "Zone N-1", password: "Vanprabha@007", status: "Active" }, 
-  { name: "Kavitha Reddy", id: "VP-CS-002", role: "Cluster Supervisor", division: "South", zone: "Zone S-3", password: "Vanprabha@008", status: "Active" }, 
-  { name: "Ravi Chauhan", id: "VP-FW-001", role: "Field Warden", division: "North", zone: "Zone N-1", password: "Vanprabha@009", status: "Active" }, 
-  { name: "Seema Tiwari", id: "VP-FW-002", role: "Field Warden", division: "East", zone: "Zone E-2", password: "Vanprabha@010", status: "Active" }, 
-  { name: "Imran Siddiqui", id: "VP-LI-001", role: "Litter Inspector", division: "West", zone: "Zone W-2", password: "Vanprabha@011", status: "Active" }, 
-  { name: "Pooja Bhatt", id: "VP-LI-002", role: "Litter Inspector", division: "South", zone: "Zone S-1", password: "Vanprabha@012", status: "Active" }, 
-  { name: "Arjun Nair", id: "VP-ADM-001", role: "System Admin", division: "All", zone: "All", password: "Vanprabha@013", status: "Active" }, 
-  { name: "Divya Mehta", id: "VP-ADM-002", role: "System Admin", division: "All", zone: "All", password: "Vanprabha@014", status: "Active" } 
+  { name: "Rajiv Menon", id: "VP-DG-001", role: "Director General", division: "All", zone: "All", status: "Active" }, 
+  { name: "Sunita Krishnan", id: "VP-DG-002", role: "Director General", division: "All", zone: "All", status: "Active" }, 
+  { name: "Arun Sharma", id: "VP-DC-001", role: "Division Conservator", division: "North", zone: "All", status: "Active" }, 
+  { name: "Priya Nambiar", id: "VP-DC-002", role: "Division Conservator", division: "South", zone: "All", status: "Active" }, 
+  { name: "Deepak Verma", id: "VP-ZC-001", role: "Zone Conservator", division: "North", zone: "Zone N-1", status: "Active" }, 
+  { name: "Anjali Rawat", id: "VP-ZC-002", role: "Zone Conservator", division: "East", zone: "Zone E-2", status: "Active" }, 
+  { name: "Manoj Pillai", id: "VP-CS-001", role: "Cluster Supervisor", division: "North", zone: "Zone N-1", status: "Active" }, 
+  { name: "Kavitha Reddy", id: "VP-CS-002", role: "Cluster Supervisor", division: "South", zone: "Zone S-3", status: "Active" }, 
+  { name: "Ravi Chauhan", id: "VP-FW-001", role: "Field Warden", division: "North", zone: "Zone N-1", status: "Active" }, 
+  { name: "Seema Tiwari", id: "VP-FW-002", role: "Field Warden", division: "East", zone: "Zone E-2", status: "Active" }, 
+  { name: "Imran Siddiqui", id: "VP-LI-001", role: "Litter Inspector", division: "West", zone: "Zone W-2", status: "Active" }, 
+  { name: "Pooja Bhatt", id: "VP-LI-002", role: "Litter Inspector", division: "South", zone: "Zone S-1", status: "Active" }, 
+  { name: "Arjun Nair", id: "VP-ADM-001", role: "System Admin", division: "All", zone: "All", status: "Active" }, 
+  { name: "Divya Mehta", id: "VP-ADM-002", role: "System Admin", division: "All", zone: "All", status: "Active" } 
 ];
-
-// Helper to seed Officers to Firestore "officers" collection automatically
-export async function seedOfficersToFirestore() {
-  try {
-    for (const officer of OFFICERS) {
-      await setDoc(doc(db, "officers", officer.id), officer, { merge: true });
-    }
-    console.log("Officers successfully synced to Firestore 'officers' collection.");
-  } catch (err) {
-    console.log("Firestore officer seeding fallback:", err);
-  }
-}
-
-// Automatically trigger officer seed on module load
-seedOfficersToFirestore();
 
 // Helper to generate 30 days history
 const generate30DaysHistory = (baseVal, variance, trend = 0) => {

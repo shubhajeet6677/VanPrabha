@@ -11,13 +11,10 @@ import {
   ArrowLeft, 
   CheckCircle2, 
   Clock, 
-  AlertTriangle, 
   Activity, 
   History, 
   Map,
-  ChevronRight,
-  SlidersHorizontal,
-  Upload
+  ChevronRight
 } from 'lucide-react';
 
 export default function LitterDetectionPage() {

@@ -23,9 +23,7 @@ import {
   Clock, 
   ShieldAlert, 
   MapPin, 
-  Activity, 
   User, 
-  Send,
   ChevronRight,
   TrendingDown
 } from 'lucide-react';

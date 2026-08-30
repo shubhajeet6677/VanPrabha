@@ -58,7 +58,7 @@ function MapRecenter({ center, zoom }) {
   return null;
 }
 
-export default function ParkMap({ parks, selectedParkId, onSelectPark }) {
+export default function ParkMap({ parks, onSelectPark }) {
   const navigate = useNavigate();
   // Default Center: New Delhi (28.6139, 77.2090)
   const defaultCenter = [28.6139, 77.2090];
