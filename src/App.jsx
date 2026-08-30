@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ParksPage from './pages/ParksPage';
@@ -21,67 +22,70 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<Login />} />
+      <ToastProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<Login />} />
 
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
 
-          <Route 
-            path="/parks" 
-            element={
-              <ProtectedRoute>
-                <ParksPage />
-              </ProtectedRoute>
-            } 
-          />
+            <Route 
+              path="/parks" 
+              element={
+                <ProtectedRoute>
+                  <ParksPage />
+                </ProtectedRoute>
+              } 
+            />
 
-          <Route 
-            path="/forests" 
-            element={
-              <ProtectedRoute>
-                <ForestsPage />
-              </ProtectedRoute>
-            } 
-          />
+            <Route 
+              path="/forests" 
+              element={
+                <ProtectedRoute>
+                  <ForestsPage />
+                </ProtectedRoute>
+              } 
+            />
 
-          <Route 
-            path="/litter" 
-            element={
-              <ProtectedRoute>
-                <LitterDetectionPage />
-              </ProtectedRoute>
-            } 
-          />
+            <Route 
+              path="/litter" 
+              element={
+                <ProtectedRoute>
+                  <LitterDetectionPage />
+                </ProtectedRoute>
+              } 
+            />
 
-          <Route 
-            path="/litter/:subTab" 
-            element={
-              <ProtectedRoute>
-                <LitterDetectionPage />
-              </ProtectedRoute>
-            } 
-          />
+            <Route 
+              path="/litter/:subTab" 
+              element={
+                <ProtectedRoute>
+                  <LitterDetectionPage />
+                </ProtectedRoute>
+              } 
+            />
 
-          <Route 
-            path="/alerts" 
-            element={
-              <ProtectedRoute>
-                <AlertsPage />
-              </ProtectedRoute>
-            } 
-          />
+            <Route 
+              path="/alerts" 
+              element={
+                <ProtectedRoute>
+                  <AlertsPage />
+                </ProtectedRoute>
+              } 
+            />
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </Router>
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }
+

@@ -64,13 +64,18 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           {/* Dashboard */}
           <button
             onClick={() => navigate('/dashboard')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            className={`relative overflow-hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
               isActive('/dashboard') 
-                ? 'bg-[#2D6A4F] text-white shadow-sm' 
+                ? 'bg-[#2D6A4F] text-white shadow-sm pl-4' 
                 : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
             }`}
           >
-            <LayoutDashboard className="w-4 h-4 text-emerald-300" />
+            <span 
+              className={`absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                isActive('/dashboard') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+              }`}
+            />
+            <LayoutDashboard className="w-4 h-4 text-emerald-300 shrink-0" />
             Dashboard
           </button>
 
@@ -83,14 +88,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   navigate('/parks');
                 }
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
                 location.pathname.startsWith('/parks')
-                  ? 'bg-emerald-900/80 text-white'
+                  ? 'bg-emerald-900/80 text-white pl-4'
                   : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
               }`}
             >
+              <span 
+                className={`absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                  location.pathname.startsWith('/parks') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                }`}
+              />
               <div className="flex items-center gap-3">
-                <TreePine className="w-4 h-4 text-emerald-300" />
+                <TreePine className="w-4 h-4 text-emerald-300 shrink-0" />
                 <span>Parks</span>
               </div>
               {parksOpen ? (
@@ -105,29 +115,44 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
                 <button
                   onClick={() => navigate('/parks')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    isActive('/parks') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    isActive('/parks') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <TreePine className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      isActive('/parks') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <TreePine className="w-3 h-3 text-emerald-300 shrink-0" />
                   All Parks
                 </button>
                 <button
                   onClick={() => navigate('/parks?tab=add')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    location.search.includes('tab=add') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    location.search.includes('tab=add') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <PlusCircle className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      location.search.includes('tab=add') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <PlusCircle className="w-3 h-3 text-emerald-300 shrink-0" />
                   Add New Park
                 </button>
                 <button
                   onClick={() => navigate('/parks?tab=zones')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    location.search.includes('tab=zones') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    location.search.includes('tab=zones') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <Map className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      location.search.includes('tab=zones') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <Map className="w-3 h-3 text-emerald-300 shrink-0" />
                   Zone Management
                 </button>
               </div>
@@ -143,14 +168,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   navigate('/forests');
                 }
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
                 location.pathname.startsWith('/forests')
-                  ? 'bg-emerald-900/80 text-white'
+                  ? 'bg-emerald-900/80 text-white pl-4'
                   : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
               }`}
             >
+              <span 
+                className={`absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                  location.pathname.startsWith('/forests') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                }`}
+              />
               <div className="flex items-center gap-3">
-                <ForestIcon className="w-4 h-4 text-emerald-300" />
+                <ForestIcon className="w-4 h-4 text-emerald-300 shrink-0" />
                 <span>Forests</span>
               </div>
               {forestsOpen ? (
@@ -165,29 +195,44 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
                 <button
                   onClick={() => navigate('/forests')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    isActive('/forests') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    isActive('/forests') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <ForestIcon className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      isActive('/forests') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <ForestIcon className="w-3 h-3 text-emerald-300 shrink-0" />
                   All Forests
                 </button>
                 <button
                   onClick={() => navigate('/forests?tab=add')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    location.search.includes('tab=add') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    location.search.includes('tab=add') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <PlusCircle className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      location.search.includes('tab=add') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <PlusCircle className="w-3 h-3 text-emerald-300 shrink-0" />
                   Add New Forest
                 </button>
                 <button
                   onClick={() => navigate('/forests?tab=zones')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    location.search.includes('tab=zones') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    location.search.includes('tab=zones') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <Map className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      location.search.includes('tab=zones') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <Map className="w-3 h-3 text-emerald-300 shrink-0" />
                   Zone Management
                 </button>
               </div>
@@ -203,14 +248,19 @@ export default function Sidebar({ isOpen, setIsOpen }) {
                   navigate('/litter/live');
                 }
               }}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+              className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
                 location.pathname.startsWith('/litter')
-                  ? 'bg-emerald-900/80 text-white'
+                  ? 'bg-emerald-900/80 text-white pl-4'
                   : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
               }`}
             >
+              <span 
+                className={`absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                  location.pathname.startsWith('/litter') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                }`}
+              />
               <div className="flex items-center gap-3">
-                <Trash2 className="w-4 h-4 text-emerald-300" />
+                <Trash2 className="w-4 h-4 text-emerald-300 shrink-0" />
                 <span>Litter Detection</span>
               </div>
               {litterOpen ? (
@@ -225,38 +275,58 @@ export default function Sidebar({ isOpen, setIsOpen }) {
               <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
                 <button
                   onClick={() => navigate('/litter/live')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    isActive('/litter/live') || isActive('/litter') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    isActive('/litter/live') || isActive('/litter') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <Activity className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      isActive('/litter/live') || isActive('/litter') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <Activity className="w-3 h-3 text-emerald-300 shrink-0" />
                   Live Feed
                 </button>
                 <button
                   onClick={() => navigate('/litter/cameras')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    isActive('/litter/cameras') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    isActive('/litter/cameras') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <Camera className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      isActive('/litter/cameras') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <Camera className="w-3 h-3 text-emerald-300 shrink-0" />
                   Camera Management
                 </button>
                 <button
                   onClick={() => navigate('/litter/history')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    isActive('/litter/history') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    isActive('/litter/history') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <History className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      isActive('/litter/history') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <History className="w-3 h-3 text-emerald-300 shrink-0" />
                   Detection History
                 </button>
                 <button
                   onClick={() => navigate('/litter/heatmap')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                    isActive('/litter/heatmap') ? 'bg-[#2D6A4F] text-white font-bold' : 'text-emerald-200/80 hover:text-white'
+                  className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
+                    isActive('/litter/heatmap') ? 'bg-[#2D6A4F] text-white font-bold pl-3.5' : 'text-emerald-200/80 hover:text-white'
                   }`}
                 >
-                  <Map className="w-3 h-3 text-emerald-300" />
+                  <span 
+                    className={`absolute left-0 top-1 bottom-1 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                      isActive('/litter/heatmap') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+                    }`}
+                  />
+                  <Map className="w-3 h-3 text-emerald-300 shrink-0" />
                   Heatmap
                 </button>
               </div>
@@ -266,17 +336,22 @@ export default function Sidebar({ isOpen, setIsOpen }) {
           {/* ALERTS SECTION */}
           <button
             onClick={() => navigate('/alerts')}
-            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+            className={`relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 ease-in-out cursor-pointer ${
               isActive('/alerts') 
-                ? 'bg-[#2D6A4F] text-white shadow-sm' 
+                ? 'bg-[#2D6A4F] text-white shadow-sm pl-4' 
                 : 'text-emerald-100/90 hover:bg-emerald-900/60 hover:text-white'
             }`}
           >
+            <span 
+              className={`absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#52B788] rounded-r transition-all duration-200 ease-in-out ${
+                isActive('/alerts') ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+              }`}
+            />
             <div className="flex items-center gap-3">
-              <Bell className="w-4 h-4 text-amber-400" />
+              <Bell className="w-4 h-4 text-amber-400 shrink-0" />
               <span>Alerts</span>
             </div>
-            <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold px-1.5 py-0.5 rounded">
+            <span className="bg-[#E63946] text-white text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm animate-alert-pulse">
               5 Active
             </span>
           </button>

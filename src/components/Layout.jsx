@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
+import SkeletonLoader from './SkeletonLoader';
 import { Menu, Bell, ShieldCheck, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
+  const location = useLocation();
+
+  // Route change skeleton loading effect (at least 600ms duration)
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname, location.search]);
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] flex font-sans">
@@ -48,14 +61,14 @@ export default function Layout({ children }) {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Active Alerts Count Chip */}
+            {/* Active Alerts Count Chip with red pulse */}
             <Link 
               to="/alerts" 
               className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-950/70 border border-emerald-800 text-xs text-emerald-100 font-medium hover:border-amber-500/60 transition-colors"
             >
               <Bell className="w-3.5 h-3.5 text-amber-400" />
               <span className="hidden md:inline">Operations Alerts:</span>
-              <span className="font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded text-[11px] border border-amber-500/30">
+              <span className="font-bold text-white bg-[#E63946] px-2 py-0.5 rounded text-[11px] border border-red-400/40 animate-alert-pulse">
                 5 Active
               </span>
             </Link>
@@ -77,11 +90,18 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        {/* Dynamic Page Content */}
+        {/* Dynamic Page Content with Fade Transition & Skeleton Load */}
         <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-          {children}
+          {loading ? (
+            <SkeletonLoader />
+          ) : (
+            <div key={location.pathname + location.search} className="animate-page-fade">
+              {children}
+            </div>
+          )}
         </main>
       </div>
     </div>
   );
 }
+

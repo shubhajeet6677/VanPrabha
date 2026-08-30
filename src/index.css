@@ -8,4 +8,138 @@
   body {
     @apply bg-background text-primary font-sans antialiased;
   }
+
+  /* BUTTONS: Scale-down effect on click (scale 0.96) & smooth hover brightness increase (150ms ease) */
+  button, .btn-interactive {
+    transition: transform 150ms ease, filter 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  }
+  button:active:not(:disabled), .btn-interactive:active:not(:disabled) {
+    transform: scale(0.96) !important;
+  }
+  button:hover:not(:disabled), .btn-interactive:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+
+  /* CARDS: Lift slightly on hover (translateY(-3px)) + subtle box-shadow increase (200ms ease) */
+  .card-hover, .hover-lift, [data-card="true"] {
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  }
+  .card-hover:hover, .hover-lift:hover, [data-card="true"]:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  /* TABLE ROWS: Subtle background highlight on hover (rgba(82, 183, 136, 0.08)) */
+  tbody tr {
+    transition: background-color 150ms ease;
+  }
+  tbody tr:hover {
+    background-color: rgba(82, 183, 136, 0.08) !important;
+  }
+
+  /* FORM INPUTS: Smooth green border glow on focus (border-color: #52B788, box-shadow: 0 0 0 3px rgba(82,183,136,0.2), 150ms ease) */
+  input, select, textarea {
+    transition: border-color 150ms ease, box-shadow 150ms ease !important;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none !important;
+    border-color: #52B788 !important;
+    box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.2) !important;
+  }
 }
+
+/* ALERT BADGES: CSS pulse animation in red #E63946 */
+@keyframes alertPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(230, 57, 70, 0.7);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 6px rgba(230, 57, 70, 0);
+  }
+}
+.animate-alert-pulse {
+  animation: alertPulse 2s infinite ease-in-out;
+}
+
+/* STATUS BADGES: Breathing glow animation for Online (green) & Offline (red) badges */
+@keyframes onlineBreathing {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(82, 183, 136, 0.4);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(82, 183, 136, 0.9);
+    opacity: 0.82;
+  }
+}
+
+@keyframes offlineBreathing {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(230, 57, 70, 0.4);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(230, 57, 70, 0.9);
+    opacity: 0.82;
+  }
+}
+
+.status-glow-online {
+  animation: onlineBreathing 2.5s infinite ease-in-out;
+}
+
+.status-glow-offline {
+  animation: offlineBreathing 2.5s infinite ease-in-out;
+}
+
+/* SKELETON LOADING: Color #2D6A4F with animated shimmer effect */
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #1B4332 0%, #2D6A4F 50%, #1B4332 100%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
+}
+
+.skeleton-shimmer-light {
+  background: linear-gradient(90deg, #2D6A4F 0%, #52B788 50%, #2D6A4F 100%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
+}
+
+/* FORM VALIDATION SHAKE ANIMATION */
+@keyframes formShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: formShake 400ms ease-in-out;
+}
+
+/* PAGE TRANSITIONS: Fade opacity 0 -> 1 over 200ms */
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-fade {
+  animation: pageFadeIn 200ms ease-out forwards;
+}
+

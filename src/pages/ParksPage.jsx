@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout';
+import Tooltip from '../components/Tooltip';
+import Breadcrumbs from '../components/Breadcrumbs';
+import { useToast } from '../contexts/ToastContext';
+import { formatRelativeTime } from '../lib/timeUtils';
 import { PARKS_LIST } from '../data/mockData';
 import { 
   ResponsiveContainer, 
@@ -8,7 +12,7 @@ import {
   Line, 
   XAxis, 
   YAxis, 
-  Tooltip, 
+  Tooltip as RechartsTooltip, 
   CartesianGrid 
 } from 'recharts';
 import { 
@@ -27,37 +31,47 @@ import {
   ChevronRight,
   Sparkles,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Check
 } from 'lucide-react';
 
 export default function ParksPage() {
   const [searchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'all';
+  const { showSuccess, showError } = useToast();
 
   const [parks, setParks] = useState(PARKS_LIST);
   const [selectedPark, setSelectedPark] = useState(null);
   const [selectedSensor, setSelectedSensor] = useState(null);
 
-  // New Park form state
+  // New Park form state & validation
   const [newParkName, setNewParkName] = useState('');
   const [newParkAbbr, setNewParkAbbr] = useState('');
   const [newParkLocation, setNewParkLocation] = useState('');
   const [newParkDivision, setNewParkDivision] = useState('North');
   const [newParkZone, setNewParkZone] = useState('North Zone 1');
-  const [addedSuccess, setAddedSuccess] = useState(false);
+  const [formTouched, setFormTouched] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
 
   const handleAddPark = (e) => {
     e.preventDefault();
-    if (!newParkName || !newParkAbbr) return;
+    setFormTouched(true);
+
+    if (!newParkName.trim() || !newParkAbbr.trim()) {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      showError('Please fill in all required park details.');
+      return;
+    }
 
     const abbrUpper = newParkAbbr.toUpperCase();
     const createdPark = {
       id: `park-${Date.now()}`,
-      name: newParkName,
+      name: newParkName.trim(),
       abbr: abbrUpper,
       division: newParkDivision,
       zone: newParkZone,
-      location: newParkLocation || 'New Delhi',
+      location: newParkLocation.trim() || 'New Delhi',
       sensors: {
         tree: [
           { id: `${abbrUpper}TA1`, name: `${newParkName} Tree Node #1`, latestReading: '1.2mm growth', unit: 'mm', status: 'Online', sparkline: [1.0, 1.1, 1.2, 1.2, 1.2, 1.2, 1.2], battery: 98, lastPing: 'Just now', history: Array.from({ length: 30 }, (_, i) => ({ day: `Day ${i + 1}`, reading: 1.2 })) },
@@ -90,9 +104,18 @@ export default function ParksPage() {
     setNewParkName('');
     setNewParkAbbr('');
     setNewParkLocation('');
-    setAddedSuccess(true);
-    setTimeout(() => setAddedSuccess(false), 3000);
+    setFormTouched(false);
+    showSuccess(`Park "${createdPark.name}" registered successfully! All telemetry nodes active.`);
   };
+
+  // Build dynamic breadcrumb items
+  const breadcrumbItems = [
+    { label: 'Parks', link: '/parks' },
+    ...(activeTab === 'add' ? [{ label: 'Add New Park' }] : []),
+    ...(activeTab === 'zones' ? [{ label: 'Zone Management' }] : []),
+    ...(selectedPark ? [{ label: selectedPark.name, link: '/parks' }] : []),
+    ...(selectedSensor ? [{ label: selectedSensor.id }] : [])
+  ];
 
   // Helper to render sparkline mini chart
   const renderSparkline = (data, isAlert) => {
@@ -116,6 +139,9 @@ export default function ParksPage() {
 
   return (
     <Layout>
+      {/* Breadcrumb Trail */}
+      <Breadcrumbs items={breadcrumbItems} />
+
       {/* Header */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
@@ -131,10 +157,11 @@ export default function ParksPage() {
         </div>
       </div>
 
+
       {/* Subtab View Handler */}
       {activeTab === 'add' ? (
         /* ADD NEW PARK SUBTAB */
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-2xl mx-auto space-y-4">
+        <div className={`bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-2xl mx-auto space-y-4 ${isShaking ? 'animate-shake' : ''}`}>
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h2 className="text-base font-bold text-[#1B4332] flex items-center gap-2">
               <PlusCircle className="w-5 h-5 text-[#2D6A4F]" />
@@ -142,37 +169,58 @@ export default function ParksPage() {
             </h2>
           </div>
 
-          {addedSuccess && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-md flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              Park registered successfully! All sensor telemetry nodes active.
-            </div>
-          )}
-
           <form onSubmit={handleAddPark} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Park Name</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                <span>Park Name *</span>
+                {newParkName.trim() ? (
+                  <span className="text-emerald-600 text-[11px] font-semibold flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Valid
+                  </span>
+                ) : formTouched ? (
+                  <span className="text-red-500 text-[11px] font-semibold">This field is required</span>
+                ) : null}
+              </label>
               <input
                 type="text"
-                required
                 value={newParkName}
                 onChange={(e) => setNewParkName(e.target.value)}
                 placeholder="e.g. Lodhi Park"
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
+                className={`w-full px-3 py-2 text-xs bg-slate-50 border rounded focus:outline-none transition-colors ${
+                  formTouched && !newParkName.trim()
+                    ? 'border-red-500 bg-red-50/30'
+                    : newParkName.trim()
+                    ? 'border-emerald-500 bg-emerald-50/20'
+                    : 'border-slate-300'
+                }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Abbreviation Code (2 Letters)</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Abbreviation Code (2-3 Letters) *</span>
+                  {newParkAbbr.trim() ? (
+                    <span className="text-emerald-600 text-[11px] font-semibold flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Valid
+                    </span>
+                  ) : formTouched ? (
+                    <span className="text-red-500 text-[11px] font-semibold">This field is required</span>
+                  ) : null}
+                </label>
                 <input
                   type="text"
-                  required
                   maxLength={3}
                   value={newParkAbbr}
                   onChange={(e) => setNewParkAbbr(e.target.value)}
                   placeholder="e.g. LP"
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] uppercase font-mono"
+                  className={`w-full px-3 py-2 text-xs bg-slate-50 border rounded focus:outline-none uppercase font-mono transition-colors ${
+                    formTouched && !newParkAbbr.trim()
+                      ? 'border-red-500 bg-red-50/30'
+                      : newParkAbbr.trim()
+                      ? 'border-emerald-500 bg-emerald-50/20'
+                      : 'border-slate-300'
+                  }`}
                 />
               </div>
 
@@ -183,7 +231,7 @@ export default function ParksPage() {
                   value={newParkLocation}
                   onChange={(e) => setNewParkLocation(e.target.value)}
                   placeholder="e.g. Central New Delhi"
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none"
                 />
               </div>
             </div>
@@ -194,7 +242,7 @@ export default function ParksPage() {
                 <select
                   value={newParkDivision}
                   onChange={(e) => setNewParkDivision(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none"
                 >
                   <option value="North">North Division</option>
                   <option value="South">South Division</option>
@@ -208,7 +256,7 @@ export default function ParksPage() {
                 <select
                   value={newParkZone}
                   onChange={(e) => setNewParkZone(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-[#2D6A4F]"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded focus:outline-none"
                 >
                   <option value="North Zone 1">North Zone 1</option>
                   <option value="South Zone 1">South Zone 1</option>
@@ -395,7 +443,7 @@ export default function ParksPage() {
           </div>
 
           {/* SECTION 1: 🌳 Tree Sensors */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
             <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
               🌳 Tree Sensors ({selectedPark.abbr}TA1 — {selectedPark.abbr}TA4)
             </h3>
@@ -405,15 +453,17 @@ export default function ParksPage() {
                 <div
                   key={sensor.id}
                   onClick={() => setSelectedSensor(sensor)}
-                  className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between"
+                  className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono font-bold text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded">
-                        {sensor.id}
-                      </span>
+                      <Tooltip text={`Tree Sensor · ${selectedPark.name} · ${selectedPark.zone}`}>
+                        <span className="text-xs font-mono font-bold text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded hover:bg-slate-300 transition-colors cursor-help">
+                          {sensor.id}
+                        </span>
+                      </Tooltip>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        sensor.status === 'Online' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                        sensor.status === 'Online' ? 'bg-emerald-100 text-emerald-800 status-glow-online' : 'bg-red-100 text-red-800 status-glow-offline'
                       }`}>
                         {sensor.status}
                       </span>
@@ -432,7 +482,7 @@ export default function ParksPage() {
                   {renderSparkline(sensor.sparkline)}
 
                   <div className="mt-2 text-[10px] text-slate-400 font-medium flex items-center justify-between pt-2 border-t border-slate-100">
-                    <span>Ping: {sensor.lastPing}</span>
+                    <span>Ping: {formatRelativeTime(sensor.lastPing)}</span>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#2D6A4F]" />
                   </div>
                 </div>
@@ -441,7 +491,7 @@ export default function ParksPage() {
           </div>
 
           {/* SECTION 2: 🌱 Soil Sensors */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
             <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
               🌱 Soil Sensors ({selectedPark.abbr}SA1 — {selectedPark.abbr}SA4)
             </h3>
@@ -451,7 +501,7 @@ export default function ParksPage() {
                 <div
                   key={sensor.id}
                   onClick={() => setSelectedSensor(sensor)}
-                  className={`p-4 rounded-lg border transition-all cursor-pointer shadow-sm group flex flex-col justify-between ${
+                  className={`p-4 rounded-lg border transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover ${
                     sensor.isAlert 
                       ? 'bg-red-50/60 border-2 border-red-500 hover:bg-red-50' 
                       : 'bg-slate-50/50 border-slate-200 hover:bg-white hover:border-[#2D6A4F]'
@@ -459,18 +509,20 @@ export default function ParksPage() {
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono font-bold text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded">
-                        {sensor.id}
-                      </span>
+                      <Tooltip text={`Soil Sensor · ${selectedPark.name} · ${selectedPark.zone}`}>
+                        <span className="text-xs font-mono font-bold text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded hover:bg-slate-300 transition-colors cursor-help">
+                          {sensor.id}
+                        </span>
+                      </Tooltip>
                       
                       {sensor.isAlert ? (
-                        <span className="text-[10px] font-extrabold bg-red-600 text-white px-2 py-0.5 rounded flex items-center gap-1 animate-pulse">
+                        <span className="text-[10px] font-extrabold bg-red-600 text-white px-2 py-0.5 rounded flex items-center gap-1 animate-pulse status-glow-offline">
                           <AlertTriangle className="w-3 h-3" />
                           CRITICAL ALERT
                         </span>
                       ) : (
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          sensor.status === 'Online' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                          sensor.status === 'Online' ? 'bg-emerald-100 text-emerald-800 status-glow-online' : 'bg-red-100 text-red-800 status-glow-offline'
                         }`}>
                           {sensor.status}
                         </span>
@@ -492,7 +544,7 @@ export default function ParksPage() {
                   {renderSparkline(sensor.sparkline, sensor.isAlert)}
 
                   <div className="mt-2 text-[10px] text-slate-400 font-medium flex items-center justify-between pt-2 border-t border-slate-100">
-                    <span>Ping: {sensor.lastPing}</span>
+                    <span>Ping: {formatRelativeTime(sensor.lastPing)}</span>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#2D6A4F]" />
                   </div>
                 </div>
@@ -501,7 +553,7 @@ export default function ParksPage() {
           </div>
 
           {/* SECTION 3: 💧 Water Sensors */}
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
             <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
               💧 Water Sensors ({selectedPark.abbr}WA1 — {selectedPark.abbr}WA4)
             </h3>
@@ -511,15 +563,17 @@ export default function ParksPage() {
                 <div
                   key={sensor.id}
                   onClick={() => setSelectedSensor(sensor)}
-                  className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between"
+                  className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono font-bold text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded">
-                        {sensor.id}
-                      </span>
+                      <Tooltip text={`Water Sensor · ${selectedPark.name} · ${selectedPark.zone}`}>
+                        <span className="text-xs font-mono font-bold text-slate-900 bg-slate-200 px-1.5 py-0.5 rounded hover:bg-slate-300 transition-colors cursor-help">
+                          {sensor.id}
+                        </span>
+                      </Tooltip>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        sensor.status === 'Online' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                        sensor.status === 'Online' ? 'bg-emerald-100 text-emerald-800 status-glow-online' : 'bg-red-100 text-red-800 status-glow-offline'
                       }`}>
                         {sensor.status}
                       </span>
@@ -538,7 +592,7 @@ export default function ParksPage() {
                   {renderSparkline(sensor.sparkline)}
 
                   <div className="mt-2 text-[10px] text-slate-400 font-medium flex items-center justify-between pt-2 border-t border-slate-100">
-                    <span>Ping: {sensor.lastPing}</span>
+                    <span>Ping: {formatRelativeTime(sensor.lastPing)}</span>
                     <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#2D6A4F]" />
                   </div>
                 </div>
@@ -548,7 +602,7 @@ export default function ParksPage() {
 
           {/* SECTION 4: 🌤️ Ambient Sensors */}
           {selectedPark.sensors.ambient && (
-            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
               <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2 pb-2 border-b border-slate-100">
                 🌤️ Ambient Weather Stations (Main Gate, North Trail, Picnic Zone, East Entrance)
               </h3>
@@ -558,14 +612,16 @@ export default function ParksPage() {
                   <div
                     key={sensor.id}
                     onClick={() => setSelectedSensor(sensor)}
-                    className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between"
+                    className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-[#2D6A4F] transition-all cursor-pointer shadow-sm group flex flex-col justify-between card-hover"
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 bg-amber-100 text-amber-900 px-2 py-0.5 rounded">
-                          {sensor.location}
-                        </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                        <Tooltip text={`Ambient Station · ${sensor.location} · ${selectedPark.name}`}>
+                          <span className="text-xs font-bold text-slate-900 bg-amber-100 text-amber-900 px-2 py-0.5 rounded cursor-help">
+                            {sensor.location}
+                          </span>
+                        </Tooltip>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 status-glow-online">
                           {sensor.status}
                         </span>
                       </div>
@@ -583,7 +639,7 @@ export default function ParksPage() {
                     {renderSparkline(sensor.sparkline)}
 
                     <div className="mt-2 text-[10px] text-slate-400 font-medium flex items-center justify-between pt-2 border-t border-slate-100">
-                      <span>Ping: {sensor.lastPing}</span>
+                      <span>Ping: {formatRelativeTime(sensor.lastPing)}</span>
                       <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#2D6A4F]" />
                     </div>
                   </div>
@@ -600,7 +656,7 @@ export default function ParksPage() {
             <div
               key={park.id}
               onClick={() => setSelectedPark(park)}
-              className="bg-white p-5 rounded-xl border border-slate-200 hover:border-[#2D6A4F] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group"
+              className="bg-white p-5 rounded-xl border border-slate-200 hover:border-[#2D6A4F] shadow-sm transition-all cursor-pointer flex flex-col justify-between group card-hover"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">

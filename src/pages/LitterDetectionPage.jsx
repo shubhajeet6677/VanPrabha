@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
+import Breadcrumbs from '../components/Breadcrumbs';
+import { useToast } from '../contexts/ToastContext';
+import { formatRelativeTime } from '../lib/timeUtils';
 import { LITTER_SITES } from '../data/mockData';
 import { 
   Trash2, 
@@ -20,6 +23,7 @@ import {
 export default function LitterDetectionPage() {
   const { subTab } = useParams();
   const navigate = useNavigate();
+  const { showSuccess } = useToast();
 
   const [sites, setSites] = useState(LITTER_SITES);
   const [selectedSite, setSelectedSite] = useState(null);
@@ -29,21 +33,40 @@ export default function LitterDetectionPage() {
   const toggleDetectionStatus = (cardId) => {
     if (!selectedCamera) return;
 
+    let updatedStatus = 'Pending';
     const updatedCamera = {
       ...selectedCamera,
-      detectionCards: selectedCamera.detectionCards.map(c => 
-        c.id === cardId ? { ...c, status: c.status === 'Pending' ? 'Cleaned' : 'Pending' } : c
-      ),
+      detectionCards: selectedCamera.detectionCards.map(c => {
+        if (c.id === cardId) {
+          updatedStatus = c.status === 'Pending' ? 'Cleaned' : 'Pending';
+          return { ...c, status: updatedStatus };
+        }
+        return c;
+      }),
       boundingBoxes: selectedCamera.boundingBoxes.map(b =>
         b.id === cardId ? { ...b, status: b.status === 'Pending' ? 'Cleaned' : 'Pending' } : b
       )
     };
 
     setSelectedCamera(updatedCamera);
+    showSuccess(`Litter detection item status updated to "${updatedStatus}".`);
   };
+
+  // Build breadcrumb items
+  const breadcrumbItems = [
+    { label: 'Litter Detection', link: '/litter/live' },
+    ...(subTab === 'cameras' ? [{ label: 'Camera Fleet' }] : []),
+    ...(subTab === 'history' ? [{ label: 'Incident History' }] : []),
+    ...(subTab === 'heatmap' ? [{ label: 'Density Heatmap' }] : []),
+    ...(selectedSite ? [{ label: selectedSite.name }] : []),
+    ...(selectedCamera ? [{ label: selectedCamera.name }] : [])
+  ];
 
   return (
     <Layout>
+      {/* Breadcrumbs */}
+      <Breadcrumbs items={breadcrumbItems} />
+
       {/* Page Title & Navigation Bar */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
@@ -61,7 +84,7 @@ export default function LitterDetectionPage() {
 
       {subTab === 'cameras' ? (
         /* CAMERA MANAGEMENT VIEW */
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base font-bold text-[#1B4332] flex items-center gap-2">
               <Camera className="w-5 h-5 text-[#2D6A4F]" />
@@ -72,10 +95,10 @@ export default function LitterDetectionPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sites.flatMap(s => s.cameras).map(cam => (
-              <div key={cam.id} className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
+              <div key={cam.id} className="p-4 bg-slate-50 border border-slate-200 rounded-lg space-y-2 card-hover">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-900">{cam.name}</span>
-                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded status-glow-online">
                     ONLINE
                   </span>
                 </div>
@@ -89,7 +112,7 @@ export default function LitterDetectionPage() {
         </div>
       ) : subTab === 'history' ? (
         /* DETECTION HISTORY VIEW */
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base font-bold text-[#1B4332] flex items-center gap-2">
               <History className="w-5 h-5 text-[#2D6A4F]" />
@@ -100,7 +123,7 @@ export default function LitterDetectionPage() {
 
           <div className="space-y-3">
             {sites.flatMap(s => s.cameras.flatMap(c => c.detectionCards)).map((det, i) => (
-              <div key={i} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+              <div key={i} className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between card-hover">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded overflow-hidden flex-shrink-0 border border-slate-300">
                     <img src={det.snapshot} alt={det.item} className="w-full h-full object-cover" />
@@ -108,7 +131,7 @@ export default function LitterDetectionPage() {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900">{det.item}</h4>
                     <span className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Clock className="w-3 h-3" /> {det.timestamp}
+                      <Clock className="w-3 h-3" /> {formatRelativeTime(det.timestamp)}
                     </span>
                   </div>
                 </div>
@@ -116,8 +139,9 @@ export default function LitterDetectionPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-semibold text-[#1B4332]">{det.confidence}% AI Confidence</span>
                   <span className={`text-xs font-bold px-2.5 py-0.5 rounded ${
-                    det.status === 'Cleaned' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                    det.status === 'Cleaned' ? 'bg-emerald-100 text-emerald-800 status-glow-online' : 'bg-red-100 text-red-800 status-glow-offline'
                   }`}>
+
                     {det.status}
                   </span>
                 </div>
