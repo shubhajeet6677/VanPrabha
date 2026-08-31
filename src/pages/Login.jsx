@@ -5,6 +5,38 @@ import { useNavigate } from 'react-router-dom';
 import { Trees, Eye, EyeOff, X, AlertCircle } from 'lucide-react';
 import { DIVISIONS, DIVISION_ZONES, ROLES, OFFICERS } from '../data/mockData';
 
+// Card Data for Left Panel Grid
+const PHOTO_CARDS = [
+  {
+    id: 'petra',
+    name: 'Petra',
+    location: 'Jordan',
+    image: 'https://images.unsplash.com/photo-1606210122158-eeb10e0823bf?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Petra',
+  },
+  {
+    id: 'chichen-itza',
+    name: 'Chichén Itzá',
+    location: 'Yucatan, Mexico',
+    image: 'https://images.unsplash.com/photo-1568402102990-bc541580b59f?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Chichen_Itza',
+  },
+  {
+    id: 'machu-picchu',
+    name: 'Machu Picchu',
+    location: 'Peru',
+    image: 'https://images.unsplash.com/photo-1567597243073-2d274aabecec?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Machu_Picchu',
+  },
+  {
+    id: 'gwk',
+    name: 'Garuda Wisnu Kencana',
+    location: 'Bali, Indonesia',
+    image: 'https://images.unsplash.com/photo-1735611687262-242fff168cb6?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Garuda_Wisnu_Kencana_cultural_park',
+  },
+];
+
 export default function Login() {
   const { loginOfficer } = useAuth();
   const { showSuccess } = useToast();
@@ -20,6 +52,7 @@ export default function Login() {
   const [errorBanner, setErrorBanner] = useState('');
   const [formTouched, setFormTouched] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
+  const [expandedCard, setExpandedCard] = useState(null);
 
   const handleDivisionChange = (e) => {
     const selectedDiv = e.target.value;
@@ -161,39 +194,142 @@ export default function Login() {
       >
         
         {/* LEFT COLUMN (45% width on desktop, hidden on mobile) */}
-        <div className="hidden md:flex md:w-[45%] relative bg-cover bg-center rounded-l-[20px] overflow-hidden flex-col justify-between p-8 text-white select-none"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1511497584788-876761c13906?q=80&w=1200&auto=format&fit=crop')`
-          }}
+        <div 
+          className="hidden md:block md:w-[45%] relative rounded-l-[20px] overflow-hidden p-[16px] select-none"
+          style={{ backgroundColor: '#1B4332' }}
         >
-          {/* Dark Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 pointer-events-none" />
+          {/* 2x2 Photo Cards Grid */}
+          <div className="grid grid-cols-2 grid-rows-2 gap-[10px] w-full h-full">
+            {PHOTO_CARDS.map((card) => (
+              <div
+                key={card.id}
+                onClick={() => setExpandedCard(card)}
+                className="relative overflow-hidden rounded-[14px] cursor-pointer group w-full h-full select-none"
+              >
+                {/* Photo Background */}
+                <img
+                  src={card.image}
+                  alt={card.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{
+                    transition: 'transform 400ms ease',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
 
-          {/* Top Left Branding */}
-          <div className="relative z-10 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-700/80 backdrop-blur-md border border-emerald-400/40 flex items-center justify-center text-white shadow-sm">
-              <Trees className="w-5 h-5" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white">VanPrabha</span>
+                {/* Dark Gradient Overlay */}
+                <div 
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)'
+                  }}
+                />
+
+                {/* Bottom Left Info */}
+                <div className="absolute bottom-[12px] left-[12px] right-[12px] z-10 flex flex-col justify-end pointer-events-none">
+                  <span className="text-white font-bold text-[13px] leading-tight">
+                    {card.name}
+                  </span>
+                  <span className="text-[#B7E4C7] font-normal text-[11px] leading-tight mt-[2px]">
+                    {card.location}
+                  </span>
+                </div>
+
+                {/* "Travel?" Pill Button */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(card.wiki, '_blank');
+                  }}
+                  className="absolute bottom-[12px] left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 text-white text-[11px] underline rounded-[20px] px-[12px] py-[5px] cursor-pointer whitespace-nowrap"
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    transition: 'opacity 250ms ease',
+                  }}
+                >
+                  Travel?
+                </button>
+              </div>
+            ))}
           </div>
 
-          {/* Bottom Content & Indicator Dots */}
-          <div className="relative z-10 space-y-6">
-            <div>
-              <h2 className="text-[22px] font-bold text-white leading-snug tracking-tight">
-                Protecting Forests,
-              </h2>
-              <h2 className="text-[22px] font-bold text-white leading-snug tracking-tight">
-                One Sensor at a Time
-              </h2>
-            </div>
+          {/* Full Panel Expanded View Overlay */}
+          <div
+            className={`absolute inset-0 z-30 overflow-hidden ${
+              expandedCard 
+                ? 'opacity-100 pointer-events-auto scale-100' 
+                : 'opacity-0 pointer-events-none scale-95'
+            }`}
+            style={{ transition: 'all 400ms ease' }}
+          >
+            {expandedCard && (
+              <div className="relative w-full h-full bg-[#1B4332]">
+                {/* Photo Background */}
+                <img
+                  src={expandedCard.image}
+                  alt={expandedCard.name}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
 
-            {/* Slide Indicator Dots */}
-            <div className="flex items-center justify-center gap-2 pt-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-white/40 transition-opacity" />
-              <span className="w-2.5 h-2.5 rounded-full bg-white/40 transition-opacity" />
-              <span className="w-2.5 h-2.5 rounded-full bg-white transition-opacity shadow-sm" />
-            </div>
+                {/* Dark Gradient Overlay */}
+                <div 
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)'
+                  }}
+                />
+
+                {/* Top Right Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setExpandedCard(null)}
+                  className="absolute top-[16px] right-[16px] z-40 flex items-center justify-center text-white cursor-pointer"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                    borderRadius: '50%',
+                    transition: 'background-color 200ms ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.3)')}
+                  aria-label="Close expanded card"
+                >
+                  <X style={{ width: '20px', height: '20px' }} className="text-white" />
+                </button>
+
+                {/* Bottom Overlay Content */}
+                <div className="absolute bottom-[24px] left-[24px] right-[24px] z-30 flex flex-col items-center text-center">
+                  <h3 className="text-white font-bold text-[22px] leading-tight mb-[2px]">
+                    {expandedCard.name}
+                  </h3>
+                  <p className="text-[#B7E4C7] text-[14px] leading-tight mb-[16px]">
+                    {expandedCard.location}
+                  </p>
+
+                  {/* Larger "Travel?" Button */}
+                  <button
+                    type="button"
+                    onClick={() => window.open(expandedCard.wiki, '_blank')}
+                    className="text-white text-[13px] underline rounded-[20px] cursor-pointer"
+                    style={{
+                      padding: '8px 20px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255, 255, 255, 0.35)',
+                    }}
+                  >
+                    Travel?
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
