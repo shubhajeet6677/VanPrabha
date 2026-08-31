@@ -22,7 +22,7 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex font-sans">
+    <div className="min-h-screen bg-[#FAFAF8] flex font-sans overflow-x-hidden">
       {/* Sidebar Navigation */}
       <Sidebar 
         isOpen={sidebarOpen} 

@@ -40,7 +40,7 @@ export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
 
   return (
     <aside 
-      className={`fixed top-0 left-0 z-40 h-screen bg-[#1B4332] text-white flex flex-col justify-between border-r border-emerald-900 shadow-lg transition-all duration-300 ${
+      className={`fixed top-0 left-0 z-40 h-screen bg-[#1B4332] text-white flex flex-col justify-between border-r border-emerald-900 shadow-lg transition-all duration-300 overflow-x-hidden max-w-full ${
         isCollapsed ? 'w-64 lg:w-20' : 'w-64'
       } ${
         isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -80,7 +80,7 @@ export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
         </div>
 
         {/* Navigation Items */}
-        <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
+        <nav className="p-3 space-y-1.5 overflow-y-auto overflow-x-hidden max-h-[calc(100vh-140px)] w-full max-w-full">
           
           {/* Dashboard */}
           <button
@@ -137,7 +137,7 @@ export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
 
             {/* Parks Suboptions */}
             {parksOpen && !isCollapsed && (
-              <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
+              <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1 overflow-x-hidden max-w-[calc(100%-1rem)]">
                 <button
                   onClick={() => navigate('/parks')}
                   className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
@@ -220,7 +220,7 @@ export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
 
             {/* Forests Suboptions */}
             {forestsOpen && !isCollapsed && (
-              <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
+              <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1 overflow-x-hidden max-w-[calc(100%-1rem)]">
                 <button
                   onClick={() => navigate('/forests')}
                   className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
@@ -303,7 +303,7 @@ export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
 
             {/* Litter Detection Suboptions */}
             {litterOpen && !isCollapsed && (
-              <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1">
+              <div className="mt-1 ml-4 pl-3 border-l border-emerald-700/60 space-y-1 overflow-x-hidden max-w-[calc(100%-1rem)]">
                 <button
                   onClick={() => navigate('/litter/live')}
                   className={`relative overflow-hidden w-full flex items-center gap-2 px-2.5 py-1.5 rounded text-[11px] font-medium transition-all duration-200 ease-in-out cursor-pointer ${
@@ -394,7 +394,7 @@ export default function Sidebar({ isOpen, isCollapsed, toggleCollapse }) {
       </div>
 
       {/* Officer Profile & Logout */}
-      <div className="p-3 border-t border-emerald-800/80 bg-emerald-950/40 space-y-3">
+      <div className="p-3 border-t border-emerald-800/80 bg-emerald-950/40 space-y-3 overflow-x-hidden max-w-full">
         <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'}`}>
           <div className="w-8 h-8 rounded-full bg-[#2D6A4F] border border-emerald-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
             {currentUser?.fullName ? currentUser.fullName[0].toUpperCase() : <User className="w-4 h-4" />}
