@@ -22,7 +22,8 @@ import {
   PlusCircle, 
   MapPin, 
   Layers,
-  ChevronRight
+  ChevronRight,
+  Cpu
 } from 'lucide-react';
 
 export default function TelemetryPage({
@@ -43,6 +44,17 @@ export default function TelemetryPage({
   const [sites, setSites] = useState(initialSites);
 
   const getSiteSlug = (site) => site.name.toLowerCase().replace(/\s+/g, '-');
+
+  // Dynamic zone top border color helper
+  const getZoneTopBorder = (zoneName) => {
+    if (!zoneName) return 'border-t-4 border-t-emerald-600';
+    const z = zoneName.toLowerCase();
+    if (z.includes('north')) return 'border-t-4 border-t-blue-500';
+    if (z.includes('south')) return 'border-t-4 border-t-amber-500';
+    if (z.includes('east')) return 'border-t-4 border-t-purple-500';
+    if (z.includes('west')) return 'border-t-4 border-t-teal-500';
+    return 'border-t-4 border-t-emerald-600';
+  };
 
   const selectedSite = siteId
     ? sites.find(s => 
@@ -160,7 +172,7 @@ export default function TelemetryPage({
             <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
               <div className="flex flex-wrap justify-between items-start gap-4">
                 <div>
-                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                  <span className="text-xs font-bold text-white bg-[#1B4332] px-2.5 py-1 rounded uppercase tracking-wider shadow-xs">
                     {selectedSensor.id}
                   </span>
                   <h2 className="text-xl font-bold text-[#1B4332] mt-2">{selectedSensor.name}</h2>
@@ -231,7 +243,7 @@ export default function TelemetryPage({
                 </button>
                 <div className="flex items-center gap-3">
                   <h1 className="text-2xl font-bold text-[#1B4332]">{selectedSite.name}</h1>
-                  <span className="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800">
+                  <span className="px-2.5 py-1 rounded text-xs font-black bg-[#1B4332] text-white shadow-xs border border-emerald-800/80">
                     {selectedSite.abbr}
                   </span>
                 </div>
@@ -243,7 +255,7 @@ export default function TelemetryPage({
 
               <button
                 onClick={() => navigate(`${baseRoute}?tab=add`)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2D6A4F] text-white font-medium text-xs rounded-lg hover:bg-[#1B4332] transition-colors shadow-sm cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#2D6A4F] text-white font-bold text-xs rounded-lg hover:bg-[#1B4332] transition-colors shadow-sm cursor-pointer"
               >
                 <PlusCircle className="w-4 h-4" />
                 Add New {singleSiteTitle}
@@ -266,11 +278,11 @@ export default function TelemetryPage({
                       <div
                         key={sensor.id}
                         onClick={() => navigate(`${baseRoute}/${currentSiteSlug}/${sensor.id.toLowerCase()}`)}
-                        className="p-4 rounded-lg border border-slate-200 hover:border-emerald-500 hover:shadow-md transition-all cursor-pointer bg-slate-50/50 space-y-3"
+                        className="p-4 rounded-lg border border-slate-200 hover:border-emerald-500 hover:-translate-y-1 hover:shadow-md transition-all cursor-pointer bg-slate-50/50 space-y-3"
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
+                            <span className="text-[10px] font-bold text-white bg-[#1B4332] px-2 py-0.5 rounded">
                               {sensor.id}
                             </span>
                             <h4 className="text-xs font-bold text-slate-800 mt-1 line-clamp-1">{sensor.name}</h4>
@@ -313,30 +325,37 @@ export default function TelemetryPage({
                 </p>
               </div>
 
-              {/* Sub-tab Navigation */}
-              <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+              {/* Sub-tab Navigation Buttons */}
+              <div className="flex items-center gap-2.5">
                 <button
                   onClick={() => navigate(baseRoute)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                    activeTab === 'all' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border-2 transition-all cursor-pointer shadow-xs ${
+                    activeTab === 'all' 
+                      ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-sm' 
+                      : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400 hover:bg-slate-50'
                   }`}
                 >
                   All {siteTitle} ({sites.length})
                 </button>
                 <button
                   onClick={() => navigate(`${baseRoute}?tab=zones`)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                    activeTab === 'zones' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold border-2 transition-all cursor-pointer shadow-xs ${
+                    activeTab === 'zones' 
+                      ? 'bg-[#1B4332] text-white border-[#1B4332] shadow-sm' 
+                      : 'bg-white text-slate-700 border-slate-300 hover:border-slate-400 hover:bg-slate-50'
                   }`}
                 >
                   Zones Breakdown
                 </button>
                 <button
                   onClick={() => navigate(`${baseRoute}?tab=add`)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                    activeTab === 'add' ? 'bg-white text-[#1B4332] shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                  className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-1.5 ${
+                    activeTab === 'add'
+                      ? 'bg-[#1B4332] text-white border-2 border-[#1B4332]'
+                      : 'bg-[#2D6A4F] hover:bg-[#1B4332] text-white border-2 border-[#2D6A4F] hover:border-[#1B4332] hover:shadow-md'
                   }`}
                 >
+                  <PlusCircle className="w-4 h-4" />
                   + Add {singleSiteTitle}
                 </button>
               </div>
@@ -454,8 +473,10 @@ export default function TelemetryPage({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {['North Zone 1', 'North Zone 2', 'South Zone 1'].map((zoneName) => {
                   const zoneSites = sites.filter(s => s.zone === zoneName);
+                  const zoneBorder = getZoneTopBorder(zoneName);
+
                   return (
-                    <div key={zoneName} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                    <div key={zoneName} className={`bg-white p-5 rounded-xl border border-slate-200 ${zoneBorder} shadow-sm space-y-4`}>
                       <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                         <h3 className="text-sm font-bold text-[#1B4332] flex items-center gap-2">
                           <Layers className="w-4 h-4 text-[#2D6A4F]" />
@@ -498,36 +519,43 @@ export default function TelemetryPage({
                     (acc, arr) => acc + (arr ? arr.length : 0), 0
                   );
                   const slug = getSiteSlug(site);
+                  const zoneBorder = getZoneTopBorder(site.zone);
 
                   return (
                     <div
                       key={site.id}
                       onClick={() => navigate(`${baseRoute}/${slug}`)}
-                      className="bg-white p-5 rounded-xl border border-slate-200 hover:border-emerald-500 hover:shadow-lg transition-all cursor-pointer flex flex-col justify-between space-y-4"
+                      className={`bg-white p-5 rounded-xl border border-slate-200 ${zoneBorder} hover:border-emerald-500 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-4 group`}
                     >
                       <div>
                         <div className="flex justify-between items-start">
-                          <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded">
+                          <span className="text-xs font-black text-white bg-[#1B4332] px-2.5 py-1 rounded shadow-xs border border-emerald-800/80 tracking-wide">
                             {site.abbr}
                           </span>
-                          <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+                          <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
                             {site.zone}
                           </span>
                         </div>
 
-                        <h3 className="text-base font-bold text-[#1B4332] mt-3">{site.name}</h3>
-                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+                        <h3 className="text-lg font-extrabold text-[#1B4332] mt-3.5 leading-tight">{site.name}</h3>
+                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5 font-medium">
                           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           {site.location}
                         </p>
                       </div>
 
-                      <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
-                        <span className="font-semibold text-slate-700">
-                          {totalSensors} Telemetry Nodes
-                        </span>
-                        <span className="text-[#2D6A4F] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                          View Site <ChevronRight className="w-3.5 h-3.5" />
+                      <div className="pt-3.5 border-t border-slate-100 flex justify-between items-center text-xs">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <Cpu className="w-4 h-4 text-emerald-600 shrink-0" />
+                          </div>
+                          <span className="text-xs font-semibold text-slate-600">
+                            <strong className="text-base font-black text-[#1B4332] mr-1">{totalSensors}</strong>
+                            Telemetry Nodes
+                          </span>
+                        </div>
+                        <span className="text-[#2D6A4F] font-extrabold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                          View Site <ChevronRight className="w-4 h-4" />
                         </span>
                       </div>
                     </div>
