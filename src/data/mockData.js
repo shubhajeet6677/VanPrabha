@@ -331,86 +331,86 @@ export const FORESTS_LIST = [
     }
   },
   {
-    id: 'forest-rajaji',
-    name: 'Rajaji Tiger Forest',
-    abbr: 'RF',
+    id: 'forest-kamla-nehru',
+    name: 'Kamla Nehru North Ridge',
+    abbr: 'KN',
     division: 'North',
-    zone: 'North Zone 3',
-    location: 'Foothills Forest Reserve',
+    zone: 'North Zone 1',
+    location: 'North Ridge, New Delhi',
     sensors: {
       tree: [
-        { id: 'RFTA1', name: 'Tiger Reserve Canopy Node', latestReading: '24.2 °C', unit: '°C', status: 'Online', sparkline: [23, 24, 24.2, 24.2, 24.2, 24.2, 24.2], battery: 97, lastPing: '1 min ago', history: generate30DaysHistory(24.2, 2) },
-        { id: 'RFTA2', name: 'Sap Flow Sensor', latestReading: '22.0 cm/h', unit: 'cm/h', status: 'Online', sparkline: [21, 22, 22.0, 22.0, 22.0, 22.0, 22.0], battery: 93, lastPing: '3 mins ago', history: generate30DaysHistory(22.0, 1.5) },
-        { id: 'RFTA3', name: 'Canopy Density Index', latestReading: '95 %', unit: '%', status: 'Online', sparkline: [93, 94, 95, 95, 95, 95, 95], battery: 96, lastPing: '2 mins ago', history: generate30DaysHistory(95, 2) },
-        { id: 'RFTA4', name: 'PAR Solar Node', latestReading: '1580 µmol', unit: 'µmol', status: 'Online', sparkline: [1550, 1580, 1580, 1580, 1580, 1580, 1580], battery: 91, lastPing: '5 mins ago', history: generate30DaysHistory(1580, 50) }
+        { id: 'KNTA1', name: 'North Ridge Canopy Node', latestReading: '25.2 °C', unit: '°C', status: 'Online', sparkline: [24, 25, 25.2, 25.2, 25.2, 25.2, 25.2], battery: 96, lastPing: '2 mins ago', history: generate30DaysHistory(25.2, 2) },
+        { id: 'KNTA2', name: 'Tree Growth Probe', latestReading: '20.5 cm/h', unit: 'cm/h', status: 'Online', sparkline: [19, 20, 20.5, 20.5, 20.5, 20.5, 20.5], battery: 92, lastPing: '4 mins ago', history: generate30DaysHistory(20.5, 1.5) },
+        { id: 'KNTA3', name: 'Canopy Density Index', latestReading: '91 %', unit: '%', status: 'Online', sparkline: [89, 90, 91, 91, 91, 91, 91], battery: 95, lastPing: '1 min ago', history: generate30DaysHistory(91, 2) },
+        { id: 'KNTA4', name: 'PAR Solar Node', latestReading: '1490 µmol', unit: 'µmol', status: 'Online', sparkline: [1460, 1490, 1490, 1490, 1490, 1490, 1490], battery: 89, lastPing: '5 mins ago', history: generate30DaysHistory(1490, 50) }
       ],
       soil: [
-        { id: 'RFSA1', name: 'Soil Hydration Sensor', latestReading: '58 %', unit: '%', status: 'Online', sparkline: [56, 57, 58, 58, 58, 58, 58], battery: 98, lastPing: '2 mins ago', history: generate30DaysHistory(58, 3) },
-        { id: 'RFSA2', name: 'Soil NPK Ratio', latestReading: '160/48/130', unit: 'ppm', status: 'Online', sparkline: [155, 160, 160, 160, 160, 160, 160], battery: 94, lastPing: '4 mins ago', history: generate30DaysHistory(160, 6) },
-        { id: 'RFSA3', name: 'Soil pH Sensor', latestReading: '6.5 pH', unit: 'pH', status: 'Online', sparkline: [6.4, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5], battery: 92, lastPing: '6 mins ago', history: generate30DaysHistory(6.5, 0.1) },
-        { id: 'RFSA4', name: 'Soil Temperature Node', latestReading: '21.8 °C', unit: '°C', status: 'Online', sparkline: [21, 21.8, 21.8, 21.8, 21.8, 21.8, 21.8], battery: 89, lastPing: '1 min ago', history: generate30DaysHistory(21.8, 1) }
+        { id: 'KNSA1', name: 'Ridge Soil Hydration', latestReading: '54 %', unit: '%', status: 'Online', sparkline: [52, 53, 54, 54, 54, 54, 54], battery: 97, lastPing: '2 mins ago', history: generate30DaysHistory(54, 3) },
+        { id: 'KNSA2', name: 'Soil NPK Ratio', latestReading: '148/42/118', unit: 'ppm', status: 'Online', sparkline: [142, 148, 148, 148, 148, 148, 148], battery: 93, lastPing: '4 mins ago', history: generate30DaysHistory(148, 6) },
+        { id: 'KNSA3', name: 'Soil pH Sensor', latestReading: '6.6 pH', unit: 'pH', status: 'Online', sparkline: [6.5, 6.6, 6.6, 6.6, 6.6, 6.6, 6.6], battery: 91, lastPing: '6 mins ago', history: generate30DaysHistory(6.6, 0.1) },
+        { id: 'KNSA4', name: 'Subsoil Temp Node', latestReading: '22.1 °C', unit: '°C', status: 'Online', sparkline: [21, 22, 22.1, 22.1, 22.1, 22.1, 22.1], battery: 88, lastPing: '1 min ago', history: generate30DaysHistory(22.1, 1) }
       ],
       water: [
-        { id: 'RFWA1', name: 'Ganga Tributary Water Level', latestReading: '2.8 m', unit: 'm', status: 'Online', sparkline: [2.7, 2.8, 2.8, 2.8, 2.8, 2.8, 2.8], battery: 95, lastPing: '3 mins ago', history: generate30DaysHistory(2.8, 0.3) },
-        { id: 'RFWA2', name: 'Stream DO Level', latestReading: '8.2 mg/L', unit: 'mg/L', status: 'Online', sparkline: [8.0, 8.2, 8.2, 8.2, 8.2, 8.2, 8.2], battery: 99, lastPing: '1 min ago', history: generate30DaysHistory(8.2, 0.2) },
-        { id: 'RFWA3', name: 'Water Turbidity', latestReading: '2.1 NTU', unit: 'NTU', status: 'Online', sparkline: [2.0, 2.1, 2.1, 2.1, 2.1, 2.1, 2.1], battery: 90, lastPing: '5 mins ago', history: generate30DaysHistory(2.1, 0.2) },
-        { id: 'RFWA4', name: 'Water Temperature Probe', latestReading: '19.5 °C', unit: '°C', status: 'Online', sparkline: [19, 19.5, 19.5, 19.5, 19.5, 19.5, 19.5], battery: 93, lastPing: '2 mins ago', history: generate30DaysHistory(19.5, 0.8) }
+        { id: 'KNWA1', name: 'Ridge Reservoir Level', latestReading: '2.2 m', unit: 'm', status: 'Online', sparkline: [2.1, 2.2, 2.2, 2.2, 2.2, 2.2, 2.2], battery: 94, lastPing: '3 mins ago', history: generate30DaysHistory(2.2, 0.3) },
+        { id: 'KNWA2', name: 'Stream DO Level', latestReading: '7.8 mg/L', unit: 'mg/L', status: 'Online', sparkline: [7.6, 7.8, 7.8, 7.8, 7.8, 7.8, 7.8], battery: 98, lastPing: '1 min ago', history: generate30DaysHistory(7.8, 0.2) },
+        { id: 'KNWA3', name: 'Water Turbidity', latestReading: '2.9 NTU', unit: 'NTU', status: 'Online', sparkline: [2.7, 2.9, 2.9, 2.9, 2.9, 2.9, 2.9], battery: 89, lastPing: '5 mins ago', history: generate30DaysHistory(2.9, 0.2) },
+        { id: 'KNWA4', name: 'Water Temperature Probe', latestReading: '20.2 °C', unit: '°C', status: 'Online', sparkline: [19.5, 20.2, 20.2, 20.2, 20.2, 20.2, 20.2], battery: 92, lastPing: '2 mins ago', history: generate30DaysHistory(20.2, 0.8) }
       ]
     }
   },
   {
-    id: 'forest-corbett',
-    name: 'Jim Corbett Forest',
-    abbr: 'JF',
-    division: 'West',
-    zone: 'West Zone 2',
-    location: 'Ramnagar Reserve, Uttarakhand',
+    id: 'forest-jahanpanah',
+    name: 'Jahanpanah City Forest',
+    abbr: 'JC',
+    division: 'South',
+    zone: 'South Zone 1',
+    location: 'Mehrauli, New Delhi',
     sensors: {
       tree: [
-        { id: 'JFTA1', name: 'Corbett Sal Forest Canopy', latestReading: '23.8 °C', unit: '°C', status: 'Online', sparkline: [23, 23.5, 23.8, 23.8, 23.8, 23.8, 23.8], battery: 98, lastPing: '2 mins ago', history: generate30DaysHistory(23.8, 2) },
-        { id: 'JFTA2', name: 'Tree Trunk Strain', latestReading: '23.1 cm/h', unit: 'cm/h', status: 'Online', sparkline: [22, 23, 23.1, 23.1, 23.1, 23.1, 23.1], battery: 94, lastPing: '4 mins ago', history: generate30DaysHistory(23.1, 1.5) },
-        { id: 'JFTA3', name: 'Canopy Coverage Index', latestReading: '96 %', unit: '%', status: 'Online', sparkline: [95, 96, 96, 96, 96, 96, 96], battery: 97, lastPing: '1 min ago', history: generate30DaysHistory(96, 2) },
-        { id: 'JFTA4', name: 'Solar PAR Sensor', latestReading: '1600 µmol', unit: 'µmol', status: 'Online', sparkline: [1570, 1600, 1600, 1600, 1600, 1600, 1600], battery: 92, lastPing: '6 mins ago', history: generate30DaysHistory(1600, 40) }
+        { id: 'JCTA1', name: 'Mehrauli Canopy Sensor', latestReading: '26.1 °C', unit: '°C', status: 'Online', sparkline: [25, 26, 26.1, 26.1, 26.1, 26.1, 26.1], battery: 95, lastPing: '2 mins ago', history: generate30DaysHistory(26.1, 2) },
+        { id: 'JCTA2', name: 'Tree Growth Probe', latestReading: '18.9 cm/h', unit: 'cm/h', status: 'Online', sparkline: [18, 18.5, 18.9, 18.9, 18.9, 18.9, 18.9], battery: 91, lastPing: '4 mins ago', history: generate30DaysHistory(18.9, 1.5) },
+        { id: 'JCTA3', name: 'Canopy Coverage Index', latestReading: '88 %', unit: '%', status: 'Online', sparkline: [86, 87, 88, 88, 88, 88, 88], battery: 93, lastPing: '1 min ago', history: generate30DaysHistory(88, 2) },
+        { id: 'JCTA4', name: 'Solar PAR Sensor', latestReading: '1440 µmol', unit: 'µmol', status: 'Online', sparkline: [1410, 1440, 1440, 1440, 1440, 1440, 1440], battery: 90, lastPing: '6 mins ago', history: generate30DaysHistory(1440, 40) }
       ],
       soil: [
-        { id: 'JFSA1', name: 'Sal Woods Soil Moisture', latestReading: '62 %', unit: '%', status: 'Online', sparkline: [60, 61, 62, 62, 62, 62, 62], battery: 99, lastPing: '2 mins ago', history: generate30DaysHistory(62, 3) },
-        { id: 'JFSA2', name: 'Soil NPK Content', latestReading: '165/50/135', unit: 'ppm', status: 'Online', sparkline: [160, 165, 165, 165, 165, 165, 165], battery: 95, lastPing: '5 mins ago', history: generate30DaysHistory(165, 5) },
-        { id: 'JFSA3', name: 'Soil pH Sensor', latestReading: '6.4 pH', unit: 'pH', status: 'Online', sparkline: [6.3, 6.4, 6.4, 6.4, 6.4, 6.4, 6.4], battery: 93, lastPing: '3 mins ago', history: generate30DaysHistory(6.4, 0.1) },
-        { id: 'JFSA4', name: 'Subsoil Temperature Node', latestReading: '21.0 °C', unit: '°C', status: 'Online', sparkline: [20.5, 21, 21.0, 21.0, 21.0, 21.0, 21.0], battery: 91, lastPing: '7 mins ago', history: generate30DaysHistory(21.0, 1) }
+        { id: 'JCSA1', name: 'City Forest Soil Hydration', latestReading: '46 %', unit: '%', status: 'Online', sparkline: [44, 45, 46, 46, 46, 46, 46], battery: 96, lastPing: '2 mins ago', history: generate30DaysHistory(46, 3) },
+        { id: 'JCSA2', name: 'Soil NPK Content', latestReading: '136/36/112', unit: 'ppm', status: 'Online', sparkline: [130, 136, 136, 136, 136, 136, 136], battery: 92, lastPing: '5 mins ago', history: generate30DaysHistory(136, 5) },
+        { id: 'JCSA3', name: 'Soil pH Sensor', latestReading: '6.8 pH', unit: 'pH', status: 'Online', sparkline: [6.7, 6.8, 6.8, 6.8, 6.8, 6.8, 6.8], battery: 94, lastPing: '3 mins ago', history: generate30DaysHistory(6.8, 0.1) },
+        { id: 'JCSA4', name: 'Subsoil Temperature Node', latestReading: '23.4 °C', unit: '°C', status: 'Online', sparkline: [22.5, 23, 23.4, 23.4, 23.4, 23.4, 23.4], battery: 89, lastPing: '7 mins ago', history: generate30DaysHistory(23.4, 1) }
       ],
       water: [
-        { id: 'JFWA1', name: 'Ramganga River Level', latestReading: '3.5 m', unit: 'm', status: 'Online', sparkline: [3.4, 3.5, 3.5, 3.5, 3.5, 3.5, 3.5], battery: 96, lastPing: '1 min ago', history: generate30DaysHistory(3.5, 0.3) },
-        { id: 'JFWA2', name: 'River Dissolved Oxygen', latestReading: '8.5 mg/L', unit: 'mg/L', status: 'Online', sparkline: [8.3, 8.5, 8.5, 8.5, 8.5, 8.5, 8.5], battery: 99, lastPing: '3 mins ago', history: generate30DaysHistory(8.5, 0.2) },
-        { id: 'JFWA3', name: 'River Turbidity Index', latestReading: '1.9 NTU', unit: 'NTU', status: 'Online', sparkline: [1.8, 1.9, 1.9, 1.9, 1.9, 1.9, 1.9], battery: 92, lastPing: '4 mins ago', history: generate30DaysHistory(1.9, 0.1) },
-        { id: 'JFWA4', name: 'Water Temperature Probe', latestReading: '18.9 °C', unit: '°C', status: 'Online', sparkline: [18, 18.9, 18.9, 18.9, 18.9, 18.9, 18.9], battery: 94, lastPing: '2 mins ago', history: generate30DaysHistory(18.9, 0.8) }
+        { id: 'JCWA1', name: 'Eco Pond Level', latestReading: '2.5 m', unit: 'm', status: 'Online', sparkline: [2.4, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5], battery: 93, lastPing: '1 min ago', history: generate30DaysHistory(2.5, 0.3) },
+        { id: 'JCWA2', name: 'Pond Dissolved Oxygen', latestReading: '7.5 mg/L', unit: 'mg/L', status: 'Online', sparkline: [7.3, 7.5, 7.5, 7.5, 7.5, 7.5, 7.5], battery: 97, lastPing: '3 mins ago', history: generate30DaysHistory(7.5, 0.2) },
+        { id: 'JCWA3', name: 'Water Turbidity Index', latestReading: '3.4 NTU', unit: 'NTU', status: 'Online', sparkline: [3.2, 3.4, 3.4, 3.4, 3.4, 3.4, 3.4], battery: 87, lastPing: '4 mins ago', history: generate30DaysHistory(3.4, 0.3) },
+        { id: 'JCWA4', name: 'Water Temperature Probe', latestReading: '21.6 °C', unit: '°C', status: 'Online', sparkline: [20.8, 21.6, 21.6, 21.6, 21.6, 21.6, 21.6], battery: 91, lastPing: '2 mins ago', history: generate30DaysHistory(21.6, 0.8) }
       ]
     }
   },
   {
-    id: 'forest-sariska',
-    name: 'Sariska Valley Forest',
-    abbr: 'SF',
-    division: 'East',
-    zone: 'East Zone 1',
-    location: 'Alwar Ridge, Rajasthan',
+    id: 'forest-sanjay-van',
+    name: 'Sanjay Van',
+    abbr: 'SV',
+    division: 'South',
+    zone: 'South Zone 2',
+    location: 'Vasant Kunj, New Delhi',
     sensors: {
       tree: [
-        { id: 'SFTA1', name: 'Valley Canopy Sensor #1', latestReading: '29.5 °C', unit: '°C', status: 'Online', sparkline: [28, 29, 29.5, 29.5, 29.5, 29.5, 29.5], battery: 89, lastPing: '3 mins ago', history: generate30DaysHistory(29.5, 3) },
-        { id: 'SFTA2', name: 'Tree Growth Probe', latestReading: '16.0 cm/h', unit: 'cm/h', status: 'Online', sparkline: [15.5, 16, 16.0, 16.0, 16.0, 16.0, 16.0], battery: 84, lastPing: '6 mins ago', history: generate30DaysHistory(16.0, 1) },
-        { id: 'SFTA3', name: 'Canopy Coverage Index', latestReading: '79 %', unit: '%', status: 'Online', sparkline: [77, 78, 79, 79, 79, 79, 79], battery: 88, lastPing: '2 mins ago', history: generate30DaysHistory(79, 4) },
-        { id: 'SFTA4', name: 'Solar PAR Absorption', latestReading: '1390 µmol', unit: 'µmol', status: 'Online', sparkline: [1360, 1390, 1390, 1390, 1390, 1390, 1390], battery: 91, lastPing: '4 mins ago', history: generate30DaysHistory(1390, 60) }
+        { id: 'SVTA1', name: 'Vasant Kunj Canopy Node', latestReading: '25.9 °C', unit: '°C', status: 'Online', sparkline: [25, 25.5, 25.9, 25.9, 25.9, 25.9, 25.9], battery: 96, lastPing: '2 mins ago', history: generate30DaysHistory(25.9, 2) },
+        { id: 'SVTA2', name: 'Tree Sap Flow Sensor', latestReading: '20.0 cm/h', unit: 'cm/h', status: 'Online', sparkline: [19, 19.8, 20.0, 20.0, 20.0, 20.0, 20.0], battery: 92, lastPing: '3 mins ago', history: generate30DaysHistory(20.0, 1.5) },
+        { id: 'SVTA3', name: 'Canopy Density Index', latestReading: '90 %', unit: '%', status: 'Online', sparkline: [88, 89, 90, 90, 90, 90, 90], battery: 94, lastPing: '1 min ago', history: generate30DaysHistory(90, 2) },
+        { id: 'SVTA4', name: 'PAR Solar Absorption', latestReading: '1470 µmol', unit: 'µmol', status: 'Online', sparkline: [1440, 1470, 1470, 1470, 1470, 1470, 1470], battery: 89, lastPing: '5 mins ago', history: generate30DaysHistory(1470, 50) }
       ],
       soil: [
-        { id: 'SFSA1', name: 'Valley Soil Hydration', latestReading: '32 %', unit: '%', status: 'Online', sparkline: [30, 31, 32, 32, 32, 32, 32], battery: 90, lastPing: '1 min ago', history: generate30DaysHistory(32, 5) },
-        { id: 'SFSA2', name: 'Soil NPK Ratio', latestReading: '120/26/90', unit: 'ppm', status: 'Online', sparkline: [115, 120, 120, 120, 120, 120, 120], battery: 85, lastPing: '5 mins ago', history: generate30DaysHistory(120, 8) },
-        { id: 'SFSA3', name: 'Soil pH Sensor', latestReading: '7.1 pH', unit: 'pH', status: 'Online', sparkline: [7.0, 7.1, 7.1, 7.1, 7.1, 7.1, 7.1], battery: 89, lastPing: '3 mins ago', history: generate30DaysHistory(7.1, 0.2) },
-        { id: 'SFSA4', name: 'Subsoil Temp Node', latestReading: '25.6 °C', unit: '°C', status: 'Online', sparkline: [25, 25.6, 25.6, 25.6, 25.6, 25.6, 25.6], battery: 86, lastPing: '8 mins ago', history: generate30DaysHistory(25.6, 1.5) }
+        { id: 'SVSA1', name: 'Forest Soil Hydration', latestReading: '50 %', unit: '%', status: 'Online', sparkline: [48, 49, 50, 50, 50, 50, 50], battery: 95, lastPing: '2 mins ago', history: generate30DaysHistory(50, 3) },
+        { id: 'SVSA2', name: 'Soil NPK Content', latestReading: '142/40/114', unit: 'ppm', status: 'Online', sparkline: [138, 142, 142, 142, 142, 142, 142], battery: 91, lastPing: '4 mins ago', history: generate30DaysHistory(142, 5) },
+        { id: 'SVSA3', name: 'Soil pH Sensor', latestReading: '6.7 pH', unit: 'pH', status: 'Online', sparkline: [6.6, 6.7, 6.7, 6.7, 6.7, 6.7, 6.7], battery: 93, lastPing: '3 mins ago', history: generate30DaysHistory(6.7, 0.1) },
+        { id: 'SVSA4', name: 'Subsoil Temp Node', latestReading: '22.8 °C', unit: '°C', status: 'Online', sparkline: [22, 22.8, 22.8, 22.8, 22.8, 22.8, 22.8], battery: 88, lastPing: '8 mins ago', history: generate30DaysHistory(22.8, 1) }
       ],
       water: [
-        { id: 'SFWA1', name: 'Valley Waterhole Sensor', latestReading: '1.1 m', unit: 'm', status: 'Online', sparkline: [1.0, 1.1, 1.1, 1.1, 1.1, 1.1, 1.1], battery: 88, lastPing: '2 mins ago', history: generate30DaysHistory(1.1, 0.2) },
-        { id: 'SFWA2', name: 'Waterhole DO Level', latestReading: '6.2 mg/L', unit: 'mg/L', status: 'Online', sparkline: [6.0, 6.2, 6.2, 6.2, 6.2, 6.2, 6.2], battery: 93, lastPing: '4 mins ago', history: generate30DaysHistory(6.2, 0.4) },
-        { id: 'SFWA3', name: 'Water Turbidity Index', latestReading: '4.8 NTU', unit: 'NTU', status: 'Online', sparkline: [4.6, 4.8, 4.8, 4.8, 4.8, 4.8, 4.8], battery: 82, lastPing: '7 mins ago', history: generate30DaysHistory(4.8, 0.5) },
-        { id: 'SFWA4', name: 'Water Temperature Probe', latestReading: '23.1 °C', unit: '°C', status: 'Online', sparkline: [22, 23.1, 23.1, 23.1, 23.1, 23.1, 23.1], battery: 87, lastPing: '3 mins ago', history: generate30DaysHistory(23.1, 1.2) }
+        { id: 'SVWA1', name: 'Lal Kot Pond Water Level', latestReading: '2.4 m', unit: 'm', status: 'Online', sparkline: [2.3, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4], battery: 94, lastPing: '1 min ago', history: generate30DaysHistory(2.4, 0.3) },
+        { id: 'SVWA2', name: 'Pond Dissolved Oxygen', latestReading: '7.7 mg/L', unit: 'mg/L', status: 'Online', sparkline: [7.5, 7.7, 7.7, 7.7, 7.7, 7.7, 7.7], battery: 98, lastPing: '3 mins ago', history: generate30DaysHistory(7.7, 0.2) },
+        { id: 'SVWA3', name: 'Water Turbidity Index', latestReading: '3.0 NTU', unit: 'NTU', status: 'Online', sparkline: [2.8, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0], battery: 88, lastPing: '4 mins ago', history: generate30DaysHistory(3.0, 0.3) },
+        { id: 'SVWA4', name: 'Water Temperature Probe', latestReading: '21.0 °C', unit: '°C', status: 'Online', sparkline: [20, 21.0, 21.0, 21.0, 21.0, 21.0, 21.0], battery: 92, lastPing: '2 mins ago', history: generate30DaysHistory(21.0, 0.8) }
       ]
     }
   }
@@ -418,10 +418,12 @@ export const FORESTS_LIST = [
 
 // LITTER DETECTION DATASET
 export const LITTER_SITES = [
+  // PARKS (6)
   {
     id: 'park-lodhi',
     name: 'Lodhi Park',
     type: 'Park',
+    image: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80',
     cameraCount: 5,
     cameras: [
       {
@@ -493,6 +495,7 @@ export const LITTER_SITES = [
     id: 'park-sanjay',
     name: 'Sanjay Park',
     type: 'Park',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
     cameraCount: 5,
     cameras: [
       {
@@ -508,52 +511,75 @@ export const LITTER_SITES = [
           { id: 'dc-6', snapshot: 'https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?auto=format&fit=crop&w=400&q=80', item: 'Plastic Water Bottle', confidence: 95.1, timestamp: '2026-08-30 10:45 AM', status: 'Pending' }
         ]
       },
-      {
-        id: 'cam-sp-2',
-        name: 'Camera 2 — North Trail',
-        location: 'Canopy Walking Track',
-        streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      },
-      {
-        id: 'cam-sp-3',
-        name: 'Camera 3 — Picnic Zone',
-        location: 'Lake View Seating Area',
-        streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 1,
-        boundingBoxes: [
-          { id: 'b7', label: 'Cardboard Box', confidence: 91.4, box: { top: '52%', left: '55%', width: '18%', height: '20%' }, status: 'Cleaned' }
-        ],
-        detectionCards: [
-          { id: 'dc-7', snapshot: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=400&q=80', item: 'Cardboard Box', confidence: 91.4, timestamp: '2026-08-30 07:45 AM', status: 'Cleaned' }
-        ]
-      },
-      {
-        id: 'cam-sp-4',
-        name: 'Camera 4 — Parking Lot',
-        location: 'Visitor Lot Alpha',
-        streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      },
-      {
-        id: 'cam-sp-5',
-        name: 'Camera 5 — East Entrance',
-        location: 'Bio-diversity East Entry',
-        streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      }
+      { id: 'cam-sp-2', name: 'Camera 2 — North Trail', location: 'Canopy Walking Track', streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-sp-3', name: 'Camera 3 — Picnic Zone', location: 'Lake View Seating Area', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 1, boundingBoxes: [{ id: 'b7', label: 'Cardboard Box', confidence: 91.4, box: { top: '52%', left: '55%', width: '18%', height: '20%' }, status: 'Cleaned' }], detectionCards: [{ id: 'dc-7', snapshot: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=400&q=80', item: 'Cardboard Box', confidence: 91.4, timestamp: '2026-08-30 07:45 AM', status: 'Cleaned' }] },
+      { id: 'cam-sp-4', name: 'Camera 4 — Parking Lot', location: 'Visitor Lot Alpha', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-sp-5', name: 'Camera 5 — East Entrance', location: 'Bio-diversity East Entry', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
     ]
   },
+  {
+    id: 'park-jahanpanah',
+    name: 'Jahanpanah Park',
+    type: 'Park',
+    image: 'https://images.unsplash.com/photo-1511497584788-876761c119ef?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-jp-1', name: 'Camera 1 — Main Gate', location: 'North Gate Trail', streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jp-2', name: 'Camera 2 — North Trail', location: 'Green Jogging Track', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jp-3', name: 'Camera 3 — Picnic Zone', location: 'Shaded Bench Area', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jp-4', name: 'Camera 4 — Parking Lot', location: 'South Gate Parking', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jp-5', name: 'Camera 5 — East Entrance', location: 'East Perimeter Gate', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'park-nehru',
+    name: 'Nehru Botanical Park',
+    type: 'Park',
+    image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-np-1', name: 'Camera 1 — Main Gate', location: 'Botanical Entrance', streamUrl: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-np-2', name: 'Camera 2 — North Trail', location: 'Rose Garden Trail', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-np-3', name: 'Camera 3 — Picnic Zone', location: 'Central Lawn Gazebo', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-np-4', name: 'Camera 4 — Parking Lot', location: 'Chanakyapuri Lot', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-np-5', name: 'Camera 5 — East Entrance', location: 'Nursery East Entry', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'park-indira',
+    name: 'Indira Park',
+    type: 'Park',
+    image: 'https://images.unsplash.com/photo-1596796946840-4144e648233d?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-ip-1', name: 'Camera 1 — Main Gate', location: 'Janakpuri Main Gate', streamUrl: 'https://images.unsplash.com/photo-1596796946840-4144e648233d?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ip-2', name: 'Camera 2 — North Trail', location: 'Children Play Track', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ip-3', name: 'Camera 3 — Picnic Zone', location: 'Fountain Square', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ip-4', name: 'Camera 4 — Parking Lot', location: 'Visitor Parking Lot', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ip-5', name: 'Camera 5 — East Entrance', location: 'West Gate Entrance', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'park-deer',
+    name: 'Deer Park',
+    type: 'Park',
+    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-dp-1', name: 'Camera 1 — Main Gate', location: 'Hauz Khas Entrance', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-dp-2', name: 'Camera 2 — North Trail', location: 'Deer Enclosure Walkway', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-dp-3', name: 'Camera 3 — Picnic Zone', location: 'Lake View Overlook', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-dp-4', name: 'Camera 4 — Parking Lot', location: 'Hauz Khas Village Parking', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-dp-5', name: 'Camera 5 — East Entrance', location: 'Monument Pathway Gate', streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+
+  // FORESTS (6)
   {
     id: 'forest-ridge',
     name: 'Central Ridge Forest',
     type: 'Forest',
+    image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80',
     cameraCount: 5,
     cameras: [
       {
@@ -569,42 +595,80 @@ export const LITTER_SITES = [
           { id: 'dc-8', snapshot: 'https://images.unsplash.com/photo-1604186837056-8e7c286756f2?auto=format&fit=crop&w=400&q=80', item: 'Discarded Glass Bottle', confidence: 93.8, timestamp: '2026-08-30 11:20 AM', status: 'Pending' }
         ]
       },
-      {
-        id: 'cam-cf-2',
-        name: 'Camera 2 — North Trail',
-        location: 'Ridge Perimeter Trail',
-        streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      },
-      {
-        id: 'cam-cf-3',
-        name: 'Camera 3 — Picnic Zone',
-        location: 'Ridge Clearing Viewpoint',
-        streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      },
-      {
-        id: 'cam-cf-4',
-        name: 'Camera 4 — Parking Lot',
-        location: 'North Ridge Parking',
-        streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      },
-      {
-        id: 'cam-cf-5',
-        name: 'Camera 5 — East Entrance',
-        location: 'Dhaula Kuan Ridge Entry',
-        streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80',
-        detectionsCount: 0,
-        boundingBoxes: [],
-        detectionCards: []
-      }
+      { id: 'cam-cf-2', name: 'Camera 2 — North Trail', location: 'Ridge Perimeter Trail', streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-cf-3', name: 'Camera 3 — Picnic Zone', location: 'Ridge Clearing Viewpoint', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-cf-4', name: 'Camera 4 — Parking Lot', location: 'North Ridge Parking', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-cf-5', name: 'Camera 5 — East Entrance', location: 'Dhaula Kuan Ridge Entry', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'forest-asola',
+    name: 'Asola Bhatti Sanctuary',
+    type: 'Forest',
+    image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-af-1', name: 'Camera 1 — Main Gate', location: 'Tughlaqabad Sanctuary Gate', streamUrl: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-af-2', name: 'Camera 2 — North Trail', location: 'Bhatti Mines Ridge', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-af-3', name: 'Camera 3 — Picnic Zone', location: 'Neelkanth Lake Trail', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-af-4', name: 'Camera 4 — Parking Lot', location: 'Sanctuary Entry Lot', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-af-5', name: 'Camera 5 — East Entrance', location: 'Surajkund Border Gate', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'forest-aravalli',
+    name: 'Aravalli Bio Forest',
+    type: 'Forest',
+    image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-ab-1', name: 'Camera 1 — Main Gate', location: 'Gurugram Border Entrance', streamUrl: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ab-2', name: 'Camera 2 — North Trail', location: 'Bio-diversity Ridge Trail', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ab-3', name: 'Camera 3 — Picnic Zone', location: 'Native Nursery Zone', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ab-4', name: 'Camera 4 — Parking Lot', location: 'Aravalli Visitor Lot', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-ab-5', name: 'Camera 5 — East Entrance', location: 'Mehrauli Gurgaon Gate', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'forest-kamla-nehru',
+    name: 'Kamla Nehru North Ridge',
+    type: 'Forest',
+    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-kn-1', name: 'Camera 1 — Main Gate', location: 'DU North Campus Gate', streamUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-kn-2', name: 'Camera 2 — North Trail', location: 'Flagstaff Tower Trail', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-kn-3', name: 'Camera 3 — Picnic Zone', location: 'Khooni Khan Jheel Viewpoint', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-kn-4', name: 'Camera 4 — Parking Lot', location: 'Vice Regal Parking', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-kn-5', name: 'Camera 5 — East Entrance', location: 'Civil Lines Gate', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'forest-jahanpanah',
+    name: 'Jahanpanah City Forest',
+    type: 'Forest',
+    image: 'https://images.unsplash.com/photo-1511497584788-876761c119ef?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-jcf-1', name: 'Camera 1 — Main Gate', location: 'Alaknanda Gate', streamUrl: 'https://images.unsplash.com/photo-1511497584788-876761c119ef?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jcf-2', name: 'Camera 2 — North Trail', location: 'Central Forest Loop', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jcf-3', name: 'Camera 3 — Picnic Zone', location: 'Chirag Delhi Canopy Gazebo', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jcf-4', name: 'Camera 4 — Parking Lot', location: 'GK Part 2 Visitor Lot', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-jcf-5', name: 'Camera 5 — East Entrance', location: 'Tughlaqabad Extension Gate', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
+    ]
+  },
+  {
+    id: 'forest-sanjay-van',
+    name: 'Sanjay Van',
+    type: 'Forest',
+    image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?auto=format&fit=crop&w=800&q=80',
+    cameraCount: 5,
+    cameras: [
+      { id: 'cam-svf-1', name: 'Camera 1 — Main Gate', location: 'Qutub Institutional Gate', streamUrl: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-svf-2', name: 'Camera 2 — North Trail', location: 'Lal Kot Wall Trail', streamUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-svf-3', name: 'Camera 3 — Picnic Zone', location: 'Sufi Shrine Viewpoint', streamUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-svf-4', name: 'Camera 4 — Parking Lot', location: 'Vasant Kunj Forest Parking', streamUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
+      { id: 'cam-svf-5', name: 'Camera 5 — East Entrance', location: 'Aruna Asaf Ali Gate', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] }
     ]
   }
 ];
