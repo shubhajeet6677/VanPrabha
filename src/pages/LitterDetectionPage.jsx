@@ -532,7 +532,7 @@ export default function LitterDetectionPage() {
               className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-slate-200/80"
             >
               <img 
-                src="https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1000&q=80" 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Lodhi_Garden_New_Delhi.jpg/1280px-Lodhi_Garden_New_Delhi.jpg" 
                 alt="Parks Surveillance" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -560,7 +560,7 @@ export default function LitterDetectionPage() {
               className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-slate-200/80"
             >
               <img 
-                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80" 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Central_Ridge_Delhi.jpg/1280px-Central_Ridge_Delhi.jpg" 
                 alt="Forests Surveillance" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
