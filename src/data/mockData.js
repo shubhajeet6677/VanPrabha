@@ -423,7 +423,7 @@ export const LITTER_SITES = [
     id: 'park-lodhi',
     name: 'Lodhi Park',
     type: 'Park',
-    image: 'https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Lodhi_Garden_New_Delhi.jpg/1280px-Lodhi_Garden_New_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       {
@@ -495,7 +495,7 @@ export const LITTER_SITES = [
     id: 'park-sanjay',
     name: 'Sanjay Park',
     type: 'Park',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Sanjay_Van_Delhi.jpg/1280px-Sanjay_Van_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       {
@@ -521,7 +521,7 @@ export const LITTER_SITES = [
     id: 'park-jahanpanah',
     name: 'Jahanpanah Park',
     type: 'Park',
-    image: 'https://images.unsplash.com/photo-1511497584788-876761c119ef?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jahanpanah_forest.jpg/1280px-Jahanpanah_forest.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-jp-1', name: 'Camera 1 — Main Gate', location: 'North Gate Trail', streamUrl: 'https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -535,7 +535,7 @@ export const LITTER_SITES = [
     id: 'park-nehru',
     name: 'Nehru Botanical Park',
     type: 'Park',
-    image: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Nehru_Park_New_Delhi.jpg/1280px-Nehru_Park_New_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-np-1', name: 'Camera 1 — Main Gate', location: 'Botanical Entrance', streamUrl: 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -549,7 +549,7 @@ export const LITTER_SITES = [
     id: 'park-indira',
     name: 'Indira Park',
     type: 'Park',
-    image: 'https://images.unsplash.com/photo-1596796946840-4144e648233d?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Indira_Gandhi_Park_Delhi.jpg/1280px-Indira_Gandhi_Park_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-ip-1', name: 'Camera 1 — Main Gate', location: 'Janakpuri Main Gate', streamUrl: 'https://images.unsplash.com/photo-1596796946840-4144e648233d?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -563,7 +563,7 @@ export const LITTER_SITES = [
     id: 'park-deer',
     name: 'Deer Park',
     type: 'Park',
-    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Deer_Park_Hauz_Khas_Delhi.jpg/1280px-Deer_Park_Hauz_Khas_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-dp-1', name: 'Camera 1 — Main Gate', location: 'Hauz Khas Entrance', streamUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -579,7 +579,7 @@ export const LITTER_SITES = [
     id: 'forest-ridge',
     name: 'Central Ridge Forest',
     type: 'Forest',
-    image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Central_Ridge_Delhi.jpg/1280px-Central_Ridge_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       {
@@ -605,7 +605,7 @@ export const LITTER_SITES = [
     id: 'forest-asola',
     name: 'Asola Bhatti Sanctuary',
     type: 'Forest',
-    image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Asola_Bhatti_Wildlife_Sanctuary.jpg/1280px-Asola_Bhatti_Wildlife_Sanctuary.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-af-1', name: 'Camera 1 — Main Gate', location: 'Tughlaqabad Sanctuary Gate', streamUrl: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -619,7 +619,7 @@ export const LITTER_SITES = [
     id: 'forest-aravalli',
     name: 'Aravalli Bio Forest',
     type: 'Forest',
-    image: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Aravalli_Biodiversity_Park_Delhi.jpg/1280px-Aravalli_Biodiversity_Park_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-ab-1', name: 'Camera 1 — Main Gate', location: 'Gurugram Border Entrance', streamUrl: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -633,7 +633,7 @@ export const LITTER_SITES = [
     id: 'forest-kamla-nehru',
     name: 'Kamla Nehru North Ridge',
     type: 'Forest',
-    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Northern_Ridge_Delhi.jpg/1280px-Northern_Ridge_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-kn-1', name: 'Camera 1 — Main Gate', location: 'DU North Campus Gate', streamUrl: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -647,7 +647,7 @@ export const LITTER_SITES = [
     id: 'forest-jahanpanah',
     name: 'Jahanpanah City Forest',
     type: 'Forest',
-    image: 'https://images.unsplash.com/photo-1511497584788-876761c119ef?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Jahanpanah_forest.jpg/1280px-Jahanpanah_forest.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-jcf-1', name: 'Camera 1 — Main Gate', location: 'Alaknanda Gate', streamUrl: 'https://images.unsplash.com/photo-1511497584788-876761c119ef?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
@@ -661,7 +661,7 @@ export const LITTER_SITES = [
     id: 'forest-sanjay-van',
     name: 'Sanjay Van',
     type: 'Forest',
-    image: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?auto=format&fit=crop&w=800&q=80',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Sanjay_Van_Delhi.jpg/1280px-Sanjay_Van_Delhi.jpg',
     cameraCount: 5,
     cameras: [
       { id: 'cam-svf-1', name: 'Camera 1 — Main Gate', location: 'Qutub Institutional Gate', streamUrl: 'https://images.unsplash.com/photo-1426604966848-d7adac402bff?auto=format&fit=crop&w=1200&q=80', detectionsCount: 0, boundingBoxes: [], detectionCards: [] },
