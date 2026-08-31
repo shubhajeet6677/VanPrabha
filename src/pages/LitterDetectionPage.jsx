@@ -14,7 +14,9 @@ import {
   Activity, 
   History, 
   Map,
-  ChevronRight
+  ChevronRight,
+  TreePine,
+  Trees
 } from 'lucide-react';
 
 export default function LitterDetectionPage() {
@@ -28,11 +30,13 @@ export default function LitterDetectionPage() {
   const getSiteSlug = (site) => site.name.toLowerCase().replace(/\s+/g, '-');
   const getCameraSlug = (cam) => cam.name.toLowerCase().replace(/\s+/g, '-');
 
-  // Determine static tab vs site param
+  // Determine static subTab vs site param
+  const isParksList = subTab === 'parks';
+  const isForestsList = subTab === 'forests';
   const activeSubTab = ['cameras', 'history', 'heatmap'].includes(subTab) ? subTab : null;
 
   // Determine site param: either from siteId param or subTab param (if subTab is site slug)
-  const targetSiteSlug = siteId || (!activeSubTab && subTab !== 'live' ? subTab : null);
+  const targetSiteSlug = siteId || (!activeSubTab && !isParksList && !isForestsList && subTab !== 'live' ? subTab : null);
 
   const selectedSite = targetSiteSlug
     ? sites.find(s =>
@@ -52,6 +56,10 @@ export default function LitterDetectionPage() {
         `camera-${c.name.match(/\d+/)?.[0]}` === cameraId.toLowerCase()
       )
     : null;
+
+  // Split sites into parks and forests
+  const parkSites = sites.filter(s => s.type === 'Park');
+  const forestSites = sites.filter(s => s.type === 'Forest');
 
   // Toggle detection status (Pending <-> Cleaned)
   const toggleDetectionStatus = (cardId) => {
@@ -86,11 +94,16 @@ export default function LitterDetectionPage() {
 
   // Build breadcrumb items
   const breadcrumbItems = [
-    { label: 'Litter Detection', link: '/litter/live' },
+    { label: 'Litter Detection', link: '/litter' },
+    ...(isParksList ? [{ label: 'Parks' }] : []),
+    ...(isForestsList ? [{ label: 'Forests' }] : []),
     ...(activeSubTab === 'cameras' ? [{ label: 'Camera Fleet' }] : []),
     ...(activeSubTab === 'history' ? [{ label: 'Incident History' }] : []),
     ...(activeSubTab === 'heatmap' ? [{ label: 'Density Heatmap' }] : []),
-    ...(selectedSite ? [{ label: selectedSite.name, link: `/litter/${currentSiteSlug}` }] : []),
+    ...(selectedSite ? [
+      { label: selectedSite.type === 'Park' ? 'Parks' : 'Forests', link: selectedSite.type === 'Park' ? '/litter/parks' : '/litter/forests' },
+      { label: selectedSite.name, link: `/litter/${currentSiteSlug}` }
+    ] : []),
     ...(selectedCamera ? [{ label: selectedCamera.name }] : [])
   ];
 
@@ -99,13 +112,13 @@ export default function LitterDetectionPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs items={breadcrumbItems} />
 
-      {/* Page Title & Navigation Bar */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      {/* Page Header */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
           <div className="flex items-center gap-2">
             <Trash2 className="w-6 h-6 text-red-600" />
             <h1 className="text-2xl font-bold text-[#1B4332] tracking-tight">
-              AI Litter Detection & Camera Surveillance
+              AI Litter Detection & Surveillance
             </h1>
           </div>
           <p className="text-xs text-slate-500 mt-1">
@@ -115,14 +128,14 @@ export default function LitterDetectionPage() {
       </div>
 
       {activeSubTab === 'cameras' ? (
-        /* CAMERA MANAGEMENT VIEW */
+        /* CAMERA FLEET VIEW */
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 card-hover">
           <div className="border-b border-slate-100 pb-3">
             <h2 className="text-base font-bold text-[#1B4332] flex items-center gap-2">
               <Camera className="w-5 h-5 text-[#2D6A4F]" />
               Optical Camera Fleet Status
             </h2>
-            <p className="text-xs text-slate-500">15 High-definition AI vision cameras active across sites</p>
+            <p className="text-xs text-slate-500">Active HD AI vision cameras across all sites</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -188,7 +201,7 @@ export default function LitterDetectionPage() {
               <Map className="w-5 h-5 text-[#2D6A4F]" />
               Park & Forest Waste Accumulation Heatmap
             </h2>
-            <p className="text-xs text-slate-500">Geospatial waste accumulation density density map</p>
+            <p className="text-xs text-slate-500">Geospatial waste accumulation density map</p>
           </div>
 
           <div className="h-96 w-full bg-slate-100 rounded-lg flex items-center justify-center border border-slate-300 relative overflow-hidden">
@@ -206,7 +219,7 @@ export default function LitterDetectionPage() {
           </div>
         </div>
       ) : selectedCamera ? (
-        /* FULL CAMERA STREAM VIEW WITH PULSING LIVE BADGE & BOUNDING BOXES */
+        /* SINGLE CAMERA STREAM VIEW WITH BOUNDING BOXES & CLEANED TOGGLES */
         <div className="space-y-6">
           <button
             onClick={() => navigate(`/litter/${currentSiteSlug}`)}
@@ -217,8 +230,6 @@ export default function LitterDetectionPage() {
           </button>
 
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-6">
-            
-            {/* Camera Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-xl font-bold text-[#1B4332] flex items-center gap-2">
@@ -230,7 +241,6 @@ export default function LitterDetectionPage() {
                 </p>
               </div>
 
-              {/* Pulsing Red LIVE Badge */}
               <div className="flex items-center gap-2">
                 <span className="relative flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -242,7 +252,6 @@ export default function LitterDetectionPage() {
               </div>
             </div>
 
-            {/* Static Park Stream Image with Overlay Bounding Boxes */}
             <div className="relative w-full h-[420px] rounded-xl overflow-hidden bg-slate-900 shadow-inner border border-slate-300">
               <img 
                 src={selectedCamera.streamUrl} 
@@ -250,7 +259,6 @@ export default function LitterDetectionPage() {
                 className="w-full h-full object-cover opacity-90"
               />
 
-              {/* Draw Bounding Boxes */}
               {selectedCamera.boundingBoxes.map((box) => (
                 <div
                   key={box.id}
@@ -274,7 +282,6 @@ export default function LitterDetectionPage() {
                 </div>
               ))}
 
-              {/* Stream Overlay info */}
               <div className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur text-white text-[11px] font-mono px-3 py-1.5 rounded flex items-center gap-3 border border-slate-700">
                 <span>Stream ID: {selectedCamera.id}</span>
                 <span>•</span>
@@ -284,7 +291,6 @@ export default function LitterDetectionPage() {
               </div>
             </div>
 
-            {/* Detection Cards Below Frame */}
             <div className="space-y-3">
               <h3 className="text-sm font-bold text-[#1B4332] flex items-center justify-between">
                 <span>Detected Waste Items in Frame ({selectedCamera.detectionCards.length})</span>
@@ -320,7 +326,6 @@ export default function LitterDetectionPage() {
                       </div>
 
                       <div className="flex items-center justify-between pt-2 border-t border-slate-200 gap-2">
-                        {/* Status Badge */}
                         <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded ${
                           card.status === 'Cleaned'
                             ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
@@ -329,7 +334,6 @@ export default function LitterDetectionPage() {
                           {card.status}
                         </span>
 
-                        {/* Toggle Action Button */}
                         <button
                           onClick={() => toggleDetectionStatus(card.id)}
                           className={`py-1 px-3 rounded text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 ${
@@ -347,31 +351,29 @@ export default function LitterDetectionPage() {
                 </div>
               )}
             </div>
-
           </div>
         </div>
       ) : selectedSite ? (
-        /* SITE'S 5 CAMERA CARDS GRID */
+        /* SITE'S 5 CAMERAS GRID VIEW */
         <div className="space-y-6">
           <button
-            onClick={() => navigate('/litter/live')}
+            onClick={() => navigate(selectedSite.type === 'Park' ? '/litter/parks' : '/litter/forests')}
             className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3 py-1.5 rounded border border-slate-200 shadow-sm w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to All Sites
+            Back to {selectedSite.type === 'Park' ? 'Parks' : 'Forests'} Overview
           </button>
 
           <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h2 className="text-xl font-bold text-[#1B4332]">
-                {selectedSite.name} — AI Surveillance Cameras (5 Cards)
+                {selectedSite.name} — AI Surveillance Cameras (5 Feeds)
               </h2>
               <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded">
                 5 Cameras Provisioned
               </span>
             </div>
 
-            {/* 5 Camera Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {selectedSite.cameras.map((cam) => (
                 <div
@@ -421,40 +423,165 @@ export default function LitterDetectionPage() {
             </div>
           </div>
         </div>
-      ) : (
-        /* LANDING GRID OF PARK & FOREST NAME CARDS WITH CAMERA COUNTS */
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {sites.map((site) => (
-            <div
-              key={site.id}
-              onClick={() => navigate(`/litter/${getSiteSlug(site)}`)}
-              className="bg-white p-5 rounded-xl border border-slate-200 hover:border-[#2D6A4F] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group"
+      ) : isParksList ? (
+        /* LEVEL 2 — PARKS LIST VIEW (/litter/parks) */
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate('/litter')}
+              className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-xs hover:bg-slate-50"
             >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="p-2.5 rounded-lg bg-emerald-50 text-[#1B4332] border border-emerald-200 group-hover:bg-[#1B4332] group-hover:text-white transition-colors">
-                    <Camera className="w-5 h-5" />
-                  </div>
-                  <span className="text-xs font-bold text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded">
-                    {site.cameraCount} Cameras
-                  </span>
-                </div>
+              <ArrowLeft className="w-4 h-4 text-[#2D6A4F]" />
+              Back to Overview
+            </button>
+            <span className="text-xs font-bold text-[#1B4332] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+              6 Parks Monitored
+            </span>
+          </div>
 
-                <h3 className="text-base font-bold text-[#1B4332] group-hover:text-[#2D6A4F] transition-colors">
-                  {site.name}
-                </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {parkSites.map((park) => (
+              <div
+                key={park.id}
+                onClick={() => navigate(`/litter/${getSiteSlug(park)}`)}
+                className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-md hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-slate-200/80"
+              >
+                <img 
+                  src={park.image} 
+                  alt={park.name} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
                 
-                <p className="text-xs text-slate-500 mt-1">
-                  Type: {site.type} Site • 5 HD Vision Cameras Stream Active
+                {/* Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent flex flex-col justify-end p-6 text-white">
+                  <div className="flex items-center gap-2 mb-1">
+                    <TreePine className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">Park Reserve</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white leading-tight group-hover:text-emerald-300 transition-colors">
+                    {park.name}
+                  </h3>
+                  <p className="text-xs text-emerald-200/90 font-medium mt-1">
+                    5 Cameras Active
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : isForestsList ? (
+        /* LEVEL 2 — FORESTS LIST VIEW (/litter/forests) */
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate('/litter')}
+              className="text-xs font-bold text-slate-600 hover:text-[#1B4332] flex items-center gap-1.5 transition-colors cursor-pointer bg-white px-3.5 py-2 rounded-lg border border-slate-200 shadow-xs hover:bg-slate-50"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#2D6A4F]" />
+              Back to Overview
+            </button>
+            <span className="text-xs font-bold text-[#1B4332] bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
+              6 Forests Monitored
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {forestSites.map((forest) => (
+              <div
+                key={forest.id}
+                onClick={() => navigate(`/litter/${getSiteSlug(forest)}`)}
+                className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-md hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-slate-200/80"
+              >
+                <img 
+                  src={forest.image} 
+                  alt={forest.name} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                
+                {/* Dark Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent flex flex-col justify-end p-6 text-white">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Trees className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider">Forest Reserve</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white leading-tight group-hover:text-emerald-300 transition-colors">
+                    {forest.name}
+                  </h3>
+                  <p className="text-xs text-emerald-200/90 font-medium mt-1">
+                    5 Cameras Active
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        /* LEVEL 1 — LANDING OVERVIEW PAGE (/litter) WITH PARKS & FORESTS BLOCKS */
+        <div className="max-w-5xl mx-auto py-4 space-y-6">
+          <div className="text-center max-w-xl mx-auto mb-2">
+            <h2 className="text-xl font-bold text-[#1B4332]">Select Surveillance Zone</h2>
+            <p className="text-xs text-slate-500 mt-1">
+              Monitor optical AI cameras and litter detection across Delhi urban parks and bio-reserve forests
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Block 1: Parks */}
+            <div
+              onClick={() => navigate('/litter/parks')}
+              className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-slate-200/80"
+            >
+              <img 
+                src="https://images.unsplash.com/photo-1519331379826-f10be5486c6f?auto=format&fit=crop&w=1000&q=80" 
+                alt="Parks Surveillance" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              
+              {/* Dark Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent flex flex-col justify-end p-8 text-white">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 backdrop-blur border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+                    <TreePine className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest">Surveillance Category</span>
+                </div>
+                <h2 className="text-3xl font-black text-white leading-tight group-hover:text-emerald-300 transition-colors">
+                  Parks
+                </h2>
+                <p className="text-sm font-semibold text-emerald-200/90 mt-1">
+                  6 Monitored Sites
                 </p>
               </div>
+            </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-[#1B4332]">
-                <span>View Camera Feed</span>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#2D6A4F]" />
+            {/* Block 2: Forests */}
+            <div
+              onClick={() => navigate('/litter/forests')}
+              className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-xl hover:scale-[1.02] hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-slate-200/80"
+            >
+              <img 
+                src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80" 
+                alt="Forests Surveillance" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              
+              {/* Dark Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent flex flex-col justify-end p-8 text-white">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 backdrop-blur border border-emerald-400/40 flex items-center justify-center text-emerald-300">
+                    <Trees className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-bold text-emerald-300 uppercase tracking-widest">Surveillance Category</span>
+                </div>
+                <h2 className="text-3xl font-black text-white leading-tight group-hover:text-emerald-300 transition-colors">
+                  Forests
+                </h2>
+                <p className="text-sm font-semibold text-emerald-200/90 mt-1">
+                  6 Monitored Sites
+                </p>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       )}
     </Layout>
