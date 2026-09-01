@@ -48,67 +48,64 @@ const PHOTO_CARDS = [
 const POSITION_CONFIG = [
   {
     label: 'far-left',
-    width: 120, height: 190, borderRadius: 14,
+    width: 160, height: 250, borderRadius: 14,
     zIndex: 4,
-    transform: 'translateX(-280px) translateZ(-160px) rotateY(25deg)',
+    transform: 'translateX(-380px) translateZ(-160px) rotateY(25deg)',
     opacity: 0.6,
     boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-    floatY: -6, floatDuration: '4s', floatDelay: '1s',
+    floatDuration: '4s', floatDelay: '1s',
   },
   {
     label: 'near-left',
-    width: 150, height: 240, borderRadius: 16,
+    width: 200, height: 310, borderRadius: 16,
     zIndex: 7,
-    transform: 'translateX(-160px) translateZ(-80px) rotateY(15deg)',
+    transform: 'translateX(-210px) translateZ(-80px) rotateY(15deg)',
     opacity: 0.85,
     boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-    floatY: -8, floatDuration: '3.5s', floatDelay: '0.5s',
+    floatDuration: '3.5s', floatDelay: '0.5s',
   },
   {
     label: 'center',
-    width: 180, height: 280, borderRadius: 18,
+    width: 240, height: 370, borderRadius: 18,
     zIndex: 10,
-    transform: 'translateX(0) translateZ(0px) rotateY(0deg)',
+    transform: 'translateX(0px) translateZ(0px) rotateY(0deg)',
     opacity: 1,
     boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-    floatY: -12, floatDuration: '3s', floatDelay: '0s',
+    floatDuration: '3s', floatDelay: '0s',
   },
   {
     label: 'near-right',
-    width: 150, height: 240, borderRadius: 16,
+    width: 200, height: 310, borderRadius: 16,
     zIndex: 7,
-    transform: 'translateX(160px) translateZ(-80px) rotateY(-15deg)',
+    transform: 'translateX(210px) translateZ(-80px) rotateY(-15deg)',
     opacity: 0.85,
     boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-    floatY: -8, floatDuration: '3.5s', floatDelay: '0.5s',
+    floatDuration: '3.5s', floatDelay: '0.5s',
   },
   {
     label: 'far-right',
-    width: 120, height: 190, borderRadius: 14,
+    width: 160, height: 250, borderRadius: 14,
     zIndex: 4,
-    transform: 'translateX(280px) translateZ(-160px) rotateY(-25deg)',
+    transform: 'translateX(380px) translateZ(-160px) rotateY(-25deg)',
     opacity: 0.6,
     boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-    floatY: -6, floatDuration: '4s', floatDelay: '1s',
+    floatDuration: '4s', floatDelay: '1s',
   },
 ];
 
 // CSS keyframe injection for float animations
 const FLOAT_STYLE = `
   @keyframes floatCenter {
-    0%   { transform: var(--card-transform) translateY(0px); }
-    100% { transform: var(--card-transform) translateY(-12px); }
+    from { transform: var(--card-transform) translateY(0px); }
+    to   { transform: var(--card-transform) translateY(-12px); }
   }
   @keyframes floatNear {
-    0%   { transform: var(--card-transform) translateY(0px); }
-    100% { transform: var(--card-transform) translateY(-8px); }
+    from { transform: var(--card-transform) translateY(0px); }
+    to   { transform: var(--card-transform) translateY(-8px); }
   }
   @keyframes floatFar {
-    0%   { transform: var(--card-transform) translateY(0px); }
-    100% { transform: var(--card-transform) translateY(-6px); }
-  }
-  .card-center-hover:hover {
-    transform: var(--card-transform) translateY(0px) scale(1.04) !important;
+    from { transform: var(--card-transform) translateY(0px); }
+    to   { transform: var(--card-transform) translateY(-6px); }
   }
 `;
 
@@ -128,26 +125,36 @@ export default function Login() {
   const [formTouched, setFormTouched] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
-  // Carousel state: offset tells us which card is currently centered
-  // offset=0 → card[2] (Lodhi Garden) is center
-  // offset=1 → card[3] (Living Root Bridge) is center, etc.
-  const [carouselOffset, setCarouselOffset] = useState(0);
+  // Mouse-zone carousel:
+  // activeCardIdx = which card (0-4) is currently the center card.
+  // Default: card index 2 = Lodhi Garden
+  const [activeCardIdx, setActiveCardIdx] = useState(2);
   const [centerHovered, setCenterHovered] = useState(false);
-  const timerRef = useRef(null);
+  const panelRef = useRef(null);
 
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
+  const handlePanelMouseMove = (e) => {
+    const rect = panelRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const relX = e.clientX - rect.left;
+    const zone = Math.min(Math.floor((relX / rect.width) * 5), 4);
+    // zone 0→card0, zone1→card1, …
+    if (zone !== activeCardIdx) {
       setCenterHovered(false);
-      setCarouselOffset(prev => (prev + 1) % PHOTO_CARDS.length);
-    }, 3000);
-    return () => clearInterval(timerRef.current);
-  }, []);
+      setActiveCardIdx(zone);
+    }
+  };
 
-  // Given current offset, get which card index sits at which position
-  // position 0=far-left … 4=far-right
+  const handlePanelMouseLeave = () => {
+    setCenterHovered(false);
+    setActiveCardIdx(2); // return to Lodhi Garden
+  };
+
+  // Given activeCardIdx (the card that should be center),
+  // return which PHOTO_CARDS index sits at position posIdx (0=far-left … 4=far-right).
+  // posIdx=2 is always the center slot.
   const getCardAtPosition = (posIdx) => {
-    // center position is posIdx=2; card at center = (2 + carouselOffset) % 5
-    return (posIdx + carouselOffset) % PHOTO_CARDS.length;
+    // offset so that card[activeCardIdx] lands at posIdx=2
+    return (posIdx - 2 + activeCardIdx + PHOTO_CARDS.length) % PHOTO_CARDS.length;
   };
 
   const handleDivisionChange = (e) => {
@@ -291,8 +298,11 @@ export default function Login() {
         
         {/* LEFT COLUMN (45% width on desktop, hidden on mobile) */}
         <div
+          ref={panelRef}
           className="hidden md:flex md:w-[45%] relative rounded-l-[20px] overflow-hidden select-none flex-col items-center justify-between"
           style={{ backgroundColor: '#1B4332', padding: '20px 16px 20px' }}
+          onMouseMove={handlePanelMouseMove}
+          onMouseLeave={handlePanelMouseLeave}
         >
           {/* Inject float keyframes */}
           <style>{FLOAT_STYLE}</style>
@@ -312,7 +322,7 @@ export default function Login() {
           >
             <div
               className="relative"
-              style={{ width: '360px', height: '300px' }}
+              style={{ width: '90%', height: '85%' }}
             >
               {POSITION_CONFIG.map((pos, posIdx) => {
                 const cardIdx = getCardAtPosition(posIdx);
@@ -435,9 +445,7 @@ export default function Login() {
             }}
           >
             {PHOTO_CARDS.map((_, idx) => {
-              // active dot = whichever card is currently at center position (posIdx=2)
-              const activeDotIdx = (2 + carouselOffset) % PHOTO_CARDS.length;
-              const isActive = idx === activeDotIdx;
+              const isActive = idx === activeCardIdx;
               return (
                 <div
                   key={idx}
