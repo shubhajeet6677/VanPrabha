@@ -44,68 +44,32 @@ const PHOTO_CARDS = [
   },
 ];
 
-// Position configs: index 0=FAR LEFT, 1=NEAR LEFT, 2=CENTER, 3=NEAR RIGHT, 4=FAR RIGHT
-const POSITION_CONFIG = [
-  {
-    label: 'far-left',
-    width: 160, height: 250, borderRadius: 14,
-    zIndex: 4,
-    transform: 'translateX(-380px) translateZ(-160px) rotateY(25deg)',
-    opacity: 0.6,
-    boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-    floatDuration: '4s', floatDelay: '1s',
-  },
-  {
-    label: 'near-left',
-    width: 200, height: 310, borderRadius: 16,
-    zIndex: 7,
-    transform: 'translateX(-210px) translateZ(-80px) rotateY(15deg)',
-    opacity: 0.85,
-    boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-    floatDuration: '3.5s', floatDelay: '0.5s',
-  },
-  {
-    label: 'center',
-    width: 240, height: 370, borderRadius: 18,
-    zIndex: 10,
-    transform: 'translateX(0px) translateZ(0px) rotateY(0deg)',
-    opacity: 1,
-    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-    floatDuration: '3s', floatDelay: '0s',
-  },
-  {
-    label: 'near-right',
-    width: 200, height: 310, borderRadius: 16,
-    zIndex: 7,
-    transform: 'translateX(210px) translateZ(-80px) rotateY(-15deg)',
-    opacity: 0.85,
-    boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-    floatDuration: '3.5s', floatDelay: '0.5s',
-  },
-  {
-    label: 'far-right',
-    width: 160, height: 250, borderRadius: 14,
-    zIndex: 4,
-    transform: 'translateX(380px) translateZ(-160px) rotateY(-25deg)',
-    opacity: 0.6,
-    boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-    floatDuration: '4s', floatDelay: '1s',
-  },
+// Static per-position display data (sizes/positions computed live from panelSize)
+const POSITION_META = [
+  { label: 'far-left',   zIndex: 4,  opacity: 0.60, boxShadow: '0 8px 24px rgba(0,0,0,0.3)',  borderRadius: 14, rotateY:  25, tz: -160, floatDur: '5s',   floatDelay: '0.6s' },
+  { label: 'near-left',  zIndex: 7,  opacity: 0.85, boxShadow: '0 12px 40px rgba(0,0,0,0.4)', borderRadius: 16, rotateY:  15, tz: -80,  floatDur: '4.5s', floatDelay: '0.3s' },
+  { label: 'center',     zIndex: 10, opacity: 1.00, boxShadow: '0 20px 60px rgba(0,0,0,0.5)', borderRadius: 18, rotateY:   0, tz:   0,  floatDur: '4s',   floatDelay: '0s'   },
+  { label: 'near-right', zIndex: 7,  opacity: 0.85, boxShadow: '0 12px 40px rgba(0,0,0,0.4)', borderRadius: 16, rotateY: -15, tz: -80,  floatDur: '4.5s', floatDelay: '0.3s' },
+  { label: 'far-right',  zIndex: 4,  opacity: 0.60, boxShadow: '0 8px 24px rgba(0,0,0,0.3)',  borderRadius: 14, rotateY: -25, tz: -160, floatDur: '5s',   floatDelay: '0.6s' },
 ];
 
-// CSS keyframe injection for float animations
+// Derive pixel sizes and translateX from live panel dimensions
+const getCardMetrics = (label, pw, ph) => {
+  const wFrac = label === 'center' ? 0.55 : label.includes('near') ? 0.40 : 0.28;
+  const hFrac = label === 'center' ? 0.75 : label.includes('near') ? 0.60 : 0.45;
+  const txFrac = label === 'center' ? 0 : label.includes('near') ? (label === 'near-left' ? -0.45 : 0.45) : (label === 'far-left' ? -0.75 : 0.75);
+  return { w: pw * wFrac, h: ph * hFrac, tx: pw * txFrac };
+};
+
+// CSS keyframe injection
 const FLOAT_STYLE = `
-  @keyframes floatCenter {
-    from { transform: var(--card-transform) translateY(0px); }
-    to   { transform: var(--card-transform) translateY(-12px); }
+  @keyframes float {
+    0%   { transform: translateY(0px); }
+    100% { transform: translateY(-14px); }
   }
-  @keyframes floatNear {
-    from { transform: var(--card-transform) translateY(0px); }
-    to   { transform: var(--card-transform) translateY(-8px); }
-  }
-  @keyframes floatFar {
-    from { transform: var(--card-transform) translateY(0px); }
-    to   { transform: var(--card-transform) translateY(-6px); }
+  @keyframes cardInfoFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0px); }
   }
 `;
 
@@ -125,35 +89,44 @@ export default function Login() {
   const [formTouched, setFormTouched] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
+  // Panel size (tracked via ResizeObserver for % card sizing)
+  const [panelSize, setPanelSize] = useState({ width: 480, height: 640 });
+
   // Mouse-zone carousel:
   // activeCardIdx = which card (0-4) is currently the center card.
   // Default: card index 2 = Lodhi Garden
   const [activeCardIdx, setActiveCardIdx] = useState(2);
-  const [centerHovered, setCenterHovered] = useState(false);
   const panelRef = useRef(null);
+
+  // Track panel dimensions
+  useEffect(() => {
+    if (!panelRef.current) return;
+    const ro = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        setPanelSize({
+          width: entry.contentRect.width,
+          height: entry.contentRect.height,
+        });
+      }
+    });
+    ro.observe(panelRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   const handlePanelMouseMove = (e) => {
     const rect = panelRef.current?.getBoundingClientRect();
     if (!rect) return;
     const relX = e.clientX - rect.left;
     const zone = Math.min(Math.floor((relX / rect.width) * 5), 4);
-    // zone 0→card0, zone1→card1, …
-    if (zone !== activeCardIdx) {
-      setCenterHovered(false);
-      setActiveCardIdx(zone);
-    }
+    setActiveCardIdx(prev => prev !== zone ? zone : prev);
   };
 
   const handlePanelMouseLeave = () => {
-    setCenterHovered(false);
     setActiveCardIdx(2); // return to Lodhi Garden
   };
 
-  // Given activeCardIdx (the card that should be center),
-  // return which PHOTO_CARDS index sits at position posIdx (0=far-left … 4=far-right).
-  // posIdx=2 is always the center slot.
+  // posIdx=2 is always the center slot; map each position to the correct card
   const getCardAtPosition = (posIdx) => {
-    // offset so that card[activeCardIdx] lands at posIdx=2
     return (posIdx - 2 + activeCardIdx + PHOTO_CARDS.length) % PHOTO_CARDS.length;
   };
 
@@ -299,8 +272,8 @@ export default function Login() {
         {/* LEFT COLUMN (45% width on desktop, hidden on mobile) */}
         <div
           ref={panelRef}
-          className="hidden md:flex md:w-[45%] relative rounded-l-[20px] overflow-hidden select-none flex-col items-center justify-between"
-          style={{ backgroundColor: '#1B4332', padding: '20px 16px 20px' }}
+          className="hidden md:block md:w-[45%] relative rounded-l-[20px] select-none"
+          style={{ backgroundColor: '#1B4332' }}
           onMouseMove={handlePanelMouseMove}
           onMouseLeave={handlePanelMouseLeave}
         >
@@ -308,139 +281,170 @@ export default function Login() {
           <style>{FLOAT_STYLE}</style>
 
           {/* Top-left VanPrabha Logo */}
-          <div className="absolute top-[18px] left-[18px] flex items-center gap-2 z-20">
+          <div className="absolute top-[18px] left-[18px] flex items-center gap-2 z-30">
             <div className="w-7 h-7 rounded-md bg-[#2D6A4F] flex items-center justify-center border border-emerald-600/40">
               <Trees className="w-4 h-4 text-emerald-300" />
             </div>
             <span className="text-white font-bold text-[13px] tracking-tight">VanPrabha</span>
           </div>
 
-          {/* Coverflow Carousel Stage */}
+          {/* Coverflow Stage — fills panel minus 60px at bottom for tagline */}
           <div
-            className="flex-1 w-full flex items-center justify-center"
-            style={{ perspective: '1000px' }}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: '60px',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              perspective: '1000px',
+            }}
           >
-            <div
-              className="relative"
-              style={{ width: '90%', height: '85%' }}
-            >
-              {POSITION_CONFIG.map((pos, posIdx) => {
+            {/* Anchor div — cards use absolute positioning from its centre */}
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+              {POSITION_META.map((pos, posIdx) => {
                 const cardIdx = getCardAtPosition(posIdx);
                 const card = PHOTO_CARDS[cardIdx];
                 const isCenter = pos.label === 'center';
-                const animName = isCenter ? 'floatCenter' : (pos.label.includes('near') ? 'floatNear' : 'floatFar');
+                const { w, h, tx } = getCardMetrics(pos.label, panelSize.width, panelSize.height);
+                const transform3d = `translateX(${tx}px) translateZ(${pos.tz}px) rotateY(${pos.rotateY}deg)`;
+                const floatAnim = `float ${pos.floatDur} cubic-bezier(0.45,0.05,0.55,0.95) ${pos.floatDelay} infinite alternate`;
 
                 return (
+                  // Outer div: owns the 3D coverflow transform + smooth position transition
                   <div
                     key={`pos-${posIdx}`}
                     style={{
                       position: 'absolute',
                       top: '50%',
                       left: '50%',
-                      marginTop: `-${pos.height / 2}px`,
-                      marginLeft: `-${pos.width / 2}px`,
-                      width: `${pos.width}px`,
-                      height: `${pos.height}px`,
-                      borderRadius: `${pos.borderRadius}px`,
+                      width: `${w}px`,
+                      height: `${h}px`,
+                      marginTop: `-${h / 2}px`,
+                      marginLeft: `-${w / 2}px`,
                       zIndex: pos.zIndex,
-                      overflow: 'hidden',
                       opacity: pos.opacity,
-                      boxShadow: pos.boxShadow,
-                      '--card-transform': pos.transform,
-                      animation: `${animName} ${pos.floatDuration} ${pos.floatDelay} ease-in-out infinite alternate`,
-                      transition: 'transform 600ms cubic-bezier(0.4,0,0.2,1), opacity 600ms cubic-bezier(0.4,0,0.2,1), box-shadow 600ms cubic-bezier(0.4,0,0.2,1), width 600ms cubic-bezier(0.4,0,0.2,1), height 600ms cubic-bezier(0.4,0,0.2,1)',
-                      cursor: isCenter ? 'pointer' : 'default',
-                      transform: isCenter && centerHovered ? `${pos.transform} scale(1.04)` : undefined,
+                      transform: transform3d,
+                      // PowerPoint float: gentle ease-out, soft stop
+                      transition: 'all 700ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                     }}
-                    onMouseEnter={isCenter ? () => setCenterHovered(true) : undefined}
-                    onMouseLeave={isCenter ? () => setCenterHovered(false) : undefined}
-                    onClick={isCenter ? () => window.open(card.wiki, '_blank') : undefined}
                   >
-                    {/* Card image */}
-                    <img
-                      src={card.image}
-                      alt={card.name}
+                    {/* Inner div: owns the float idle animation independently */}
+                    <div
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                        pointerEvents: 'none',
-                        userSelect: 'none',
+                        borderRadius: `${pos.borderRadius}px`,
+                        overflow: 'hidden',
+                        boxShadow: pos.boxShadow,
+                        animation: floatAnim,
+                        cursor: isCenter ? 'pointer' : 'default',
+                        position: 'relative',
                       }}
-                      draggable={false}
-                    />
+                      onClick={isCenter ? () => window.open(card.wiki, '_blank') : undefined}
+                    >
+                      {/* Card image */}
+                      <img
+                        src={card.image}
+                        alt={card.name}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                          pointerEvents: 'none',
+                          userSelect: 'none',
+                        }}
+                        draggable={false}
+                      />
 
-                    {/* Dark gradient overlay */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)',
-                        pointerEvents: 'none',
-                      }}
-                    />
-
-                    {/* Center card hover info */}
-                    {isCenter && (
+                      {/* Dark gradient overlay */}
                       <div
                         style={{
                           position: 'absolute',
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          padding: '14px 14px 12px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          textAlign: 'center',
-                          opacity: centerHovered ? 1 : 0,
-                          transition: 'opacity 300ms ease',
-                          pointerEvents: centerHovered ? 'auto' : 'none',
+                          inset: 0,
+                          background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%)',
+                          pointerEvents: 'none',
                         }}
-                      >
-                        <span style={{ color: '#fff', fontWeight: 700, fontSize: '13px', lineHeight: '1.2', display: 'block' }}>
-                          {card.name}
-                        </span>
-                        <span style={{ color: '#B7E4C7', fontSize: '11px', marginTop: '2px', display: 'block' }}>
-                          {card.location}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={(e) => { e.stopPropagation(); window.open(card.wiki, '_blank'); }}
+                      />
+
+                      {/* Center card info — always visible, fades in on card change */}
+                      {isCenter && (
+                        <div
+                          key={activeCardIdx}
                           style={{
-                            marginTop: '8px',
-                            color: '#fff',
-                            fontSize: '11px',
-                            textDecoration: 'underline',
-                            background: 'rgba(255,255,255,0.15)',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)',
-                            border: '1px solid rgba(255,255,255,0.35)',
-                            borderRadius: '20px',
-                            padding: '4px 12px',
-                            cursor: 'pointer',
-                            pointerEvents: 'auto',
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            padding: '18px 18px 16px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'flex-start',
+                            animation: 'cardInfoFadeIn 300ms ease 200ms both',
                           }}
                         >
-                          Travel?
-                        </button>
-                      </div>
-                    )}
+                          <span style={{
+                            color: '#fff',
+                            fontFamily: 'Inter, sans-serif',
+                            fontWeight: 700,
+                            fontSize: '18px',
+                            lineHeight: '1.2',
+                            display: 'block',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.4)',
+                          }}>
+                            {card.name}
+                          </span>
+                          <span style={{
+                            color: '#B7E4C7',
+                            fontSize: '13px',
+                            marginTop: '3px',
+                            display: 'block',
+                          }}>
+                            {card.location}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); window.open(card.wiki, '_blank'); }}
+                            style={{
+                              marginTop: '10px',
+                              color: '#fff',
+                              fontSize: '12px',
+                              textDecoration: 'underline',
+                              background: 'rgba(255,255,255,0.15)',
+                              backdropFilter: 'blur(8px)',
+                              WebkitBackdropFilter: 'blur(8px)',
+                              border: '1px solid rgba(255,255,255,0.35)',
+                              borderRadius: '20px',
+                              padding: '5px 14px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Travel?
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {/* Dot Indicators */}
+          {/* Dot Indicators — pinned above tagline */}
           <div
             style={{
+              position: 'absolute',
+              bottom: '36px',
+              left: 0,
+              right: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              marginBottom: '14px',
               zIndex: 20,
             }}
           >
@@ -461,16 +465,19 @@ export default function Login() {
             })}
           </div>
 
-          {/* Bottom tagline */}
+          {/* Bottom tagline — pinned at very bottom */}
           <p
             style={{
+              position: 'absolute',
+              bottom: '10px',
+              left: 0,
+              right: 0,
               color: '#fff',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
               fontSize: '15px',
               textAlign: 'center',
               lineHeight: '1.4',
-              paddingBottom: '4px',
               zIndex: 20,
               letterSpacing: '-0.01em',
             }}
