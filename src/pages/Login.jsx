@@ -1,41 +1,116 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
-import { Trees, Eye, EyeOff, X, AlertCircle } from 'lucide-react';
+import { Trees, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { DIVISIONS, DIVISION_ZONES, ROLES, OFFICERS } from '../data/mockData';
 
-// Card Data for Left Panel Grid
+// Card Data for Coverflow Carousel
 const PHOTO_CARDS = [
   {
-    id: 'petra',
-    name: 'Petra',
-    location: 'Jordan',
-    image: 'https://images.unsplash.com/photo-1606210122158-eeb10e0823bf?w=800&q=80',
-    wiki: 'https://en.wikipedia.org/wiki/Petra',
+    id: 'gulmarg',
+    name: 'Gulmarg',
+    location: 'Jammu & Kashmir, India',
+    image: 'https://images.unsplash.com/photo-1666696760251-1047dc26ca1b?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Gulmarg',
   },
   {
-    id: 'chichen-itza',
-    name: 'Chichén Itzá',
-    location: 'Yucatan, Mexico',
-    image: 'https://images.unsplash.com/photo-1568402102990-bc541580b59f?w=800&q=80',
-    wiki: 'https://en.wikipedia.org/wiki/Chichen_Itza',
+    id: 'rann-of-kutch',
+    name: 'Rann of Kutch',
+    location: 'Gujarat, India',
+    image: 'https://images.unsplash.com/photo-1706013729724-caada9be0f97?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Rann_of_Kutch',
   },
   {
-    id: 'machu-picchu',
-    name: 'Machu Picchu',
-    location: 'Peru',
-    image: 'https://images.unsplash.com/photo-1567597243073-2d274aabecec?w=800&q=80',
-    wiki: 'https://en.wikipedia.org/wiki/Machu_Picchu',
+    id: 'lodhi-garden',
+    name: 'Lodhi Garden',
+    location: 'New Delhi, India',
+    image: 'https://images.unsplash.com/photo-1715633742301-5f6316c7dd4c?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Lodi_Garden',
   },
   {
-    id: 'gwk',
-    name: 'Garuda Wisnu Kencana',
-    location: 'Bali, Indonesia',
-    image: 'https://images.unsplash.com/photo-1735611687262-242fff168cb6?w=800&q=80',
-    wiki: 'https://en.wikipedia.org/wiki/Garuda_Wisnu_Kencana_cultural_park',
+    id: 'living-root-bridge',
+    name: 'Living Root Bridge',
+    location: 'Meghalaya, India',
+    image: 'https://images.unsplash.com/photo-1698429357860-1322a462bead?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Living_root_bridges',
+  },
+  {
+    id: 'jog-falls',
+    name: 'Jog Falls',
+    location: 'Karnataka, India',
+    image: 'https://images.unsplash.com/photo-1622117655866-8b233395581a?w=800&q=80',
+    wiki: 'https://en.wikipedia.org/wiki/Jog_Falls',
   },
 ];
+
+// Position configs: index 0=FAR LEFT, 1=NEAR LEFT, 2=CENTER, 3=NEAR RIGHT, 4=FAR RIGHT
+const POSITION_CONFIG = [
+  {
+    label: 'far-left',
+    width: 120, height: 190, borderRadius: 14,
+    zIndex: 4,
+    transform: 'translateX(-280px) translateZ(-160px) rotateY(25deg)',
+    opacity: 0.6,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+    floatY: -6, floatDuration: '4s', floatDelay: '1s',
+  },
+  {
+    label: 'near-left',
+    width: 150, height: 240, borderRadius: 16,
+    zIndex: 7,
+    transform: 'translateX(-160px) translateZ(-80px) rotateY(15deg)',
+    opacity: 0.85,
+    boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+    floatY: -8, floatDuration: '3.5s', floatDelay: '0.5s',
+  },
+  {
+    label: 'center',
+    width: 180, height: 280, borderRadius: 18,
+    zIndex: 10,
+    transform: 'translateX(0) translateZ(0px) rotateY(0deg)',
+    opacity: 1,
+    boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+    floatY: -12, floatDuration: '3s', floatDelay: '0s',
+  },
+  {
+    label: 'near-right',
+    width: 150, height: 240, borderRadius: 16,
+    zIndex: 7,
+    transform: 'translateX(160px) translateZ(-80px) rotateY(-15deg)',
+    opacity: 0.85,
+    boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+    floatY: -8, floatDuration: '3.5s', floatDelay: '0.5s',
+  },
+  {
+    label: 'far-right',
+    width: 120, height: 190, borderRadius: 14,
+    zIndex: 4,
+    transform: 'translateX(280px) translateZ(-160px) rotateY(-25deg)',
+    opacity: 0.6,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+    floatY: -6, floatDuration: '4s', floatDelay: '1s',
+  },
+];
+
+// CSS keyframe injection for float animations
+const FLOAT_STYLE = `
+  @keyframes floatCenter {
+    0%   { transform: var(--card-transform) translateY(0px); }
+    100% { transform: var(--card-transform) translateY(-12px); }
+  }
+  @keyframes floatNear {
+    0%   { transform: var(--card-transform) translateY(0px); }
+    100% { transform: var(--card-transform) translateY(-8px); }
+  }
+  @keyframes floatFar {
+    0%   { transform: var(--card-transform) translateY(0px); }
+    100% { transform: var(--card-transform) translateY(-6px); }
+  }
+  .card-center-hover:hover {
+    transform: var(--card-transform) translateY(0px) scale(1.04) !important;
+  }
+`;
 
 export default function Login() {
   const { loginOfficer } = useAuth();
@@ -52,7 +127,28 @@ export default function Login() {
   const [errorBanner, setErrorBanner] = useState('');
   const [formTouched, setFormTouched] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
-  const [expandedCard, setExpandedCard] = useState(null);
+
+  // Carousel state: offset tells us which card is currently centered
+  // offset=0 → card[2] (Lodhi Garden) is center
+  // offset=1 → card[3] (Living Root Bridge) is center, etc.
+  const [carouselOffset, setCarouselOffset] = useState(0);
+  const [centerHovered, setCenterHovered] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setCenterHovered(false);
+      setCarouselOffset(prev => (prev + 1) % PHOTO_CARDS.length);
+    }, 3000);
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  // Given current offset, get which card index sits at which position
+  // position 0=far-left … 4=far-right
+  const getCardAtPosition = (posIdx) => {
+    // center position is posIdx=2; card at center = (2 + carouselOffset) % 5
+    return (posIdx + carouselOffset) % PHOTO_CARDS.length;
+  };
 
   const handleDivisionChange = (e) => {
     const selectedDiv = e.target.value;
@@ -194,143 +290,185 @@ export default function Login() {
       >
         
         {/* LEFT COLUMN (45% width on desktop, hidden on mobile) */}
-        <div 
-          className="hidden md:block md:w-[45%] relative rounded-l-[20px] overflow-hidden p-[16px] select-none"
-          style={{ backgroundColor: '#1B4332' }}
+        <div
+          className="hidden md:flex md:w-[45%] relative rounded-l-[20px] overflow-hidden select-none flex-col items-center justify-between"
+          style={{ backgroundColor: '#1B4332', padding: '20px 16px 20px' }}
         >
-          {/* 2x2 Photo Cards Grid */}
-          <div className="grid grid-cols-2 grid-rows-2 gap-[10px] w-full h-full">
-            {PHOTO_CARDS.map((card) => (
-              <div
-                key={card.id}
-                onClick={() => setExpandedCard(card)}
-                className="relative overflow-hidden rounded-[14px] cursor-pointer group w-full h-full select-none"
-              >
-                {/* Photo Background */}
-                <img
-                  src={card.image}
-                  alt={card.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{
-                    transition: 'transform 400ms ease',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                />
+          {/* Inject float keyframes */}
+          <style>{FLOAT_STYLE}</style>
 
-                {/* Dark Gradient Overlay */}
-                <div 
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)'
-                  }}
-                />
-
-                {/* Bottom Left Info */}
-                <div className="absolute bottom-[12px] left-[12px] right-[12px] z-10 flex flex-col justify-end pointer-events-none">
-                  <span className="text-white font-bold text-[13px] leading-tight">
-                    {card.name}
-                  </span>
-                  <span className="text-[#B7E4C7] font-normal text-[11px] leading-tight mt-[2px]">
-                    {card.location}
-                  </span>
-                </div>
-
-                {/* "Travel?" Pill Button */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(card.wiki, '_blank');
-                  }}
-                  className="absolute bottom-[12px] left-1/2 -translate-x-1/2 z-20 opacity-0 group-hover:opacity-100 text-white text-[11px] underline rounded-[20px] px-[12px] py-[5px] cursor-pointer whitespace-nowrap"
-                  style={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                    backdropFilter: 'blur(8px)',
-                    WebkitBackdropFilter: 'blur(8px)',
-                    border: '1px solid rgba(255, 255, 255, 0.35)',
-                    transition: 'opacity 250ms ease',
-                  }}
-                >
-                  Travel?
-                </button>
-              </div>
-            ))}
+          {/* Top-left VanPrabha Logo */}
+          <div className="absolute top-[18px] left-[18px] flex items-center gap-2 z-20">
+            <div className="w-7 h-7 rounded-md bg-[#2D6A4F] flex items-center justify-center border border-emerald-600/40">
+              <Trees className="w-4 h-4 text-emerald-300" />
+            </div>
+            <span className="text-white font-bold text-[13px] tracking-tight">VanPrabha</span>
           </div>
 
-          {/* Full Panel Expanded View Overlay */}
+          {/* Coverflow Carousel Stage */}
           <div
-            className={`absolute inset-0 z-30 overflow-hidden ${
-              expandedCard 
-                ? 'opacity-100 pointer-events-auto scale-100' 
-                : 'opacity-0 pointer-events-none scale-95'
-            }`}
-            style={{ transition: 'all 400ms ease' }}
+            className="flex-1 w-full flex items-center justify-center"
+            style={{ perspective: '1000px' }}
           >
-            {expandedCard && (
-              <div className="relative w-full h-full bg-[#1B4332]">
-                {/* Photo Background */}
-                <img
-                  src={expandedCard.image}
-                  alt={expandedCard.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
+            <div
+              className="relative"
+              style={{ width: '360px', height: '300px' }}
+            >
+              {POSITION_CONFIG.map((pos, posIdx) => {
+                const cardIdx = getCardAtPosition(posIdx);
+                const card = PHOTO_CARDS[cardIdx];
+                const isCenter = pos.label === 'center';
+                const animName = isCenter ? 'floatCenter' : (pos.label.includes('near') ? 'floatNear' : 'floatFar');
 
-                {/* Dark Gradient Overlay */}
-                <div 
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)'
-                  }}
-                />
-
-                {/* Top Right Close Button */}
-                <button
-                  type="button"
-                  onClick={() => setExpandedCard(null)}
-                  className="absolute top-[16px] right-[16px] z-40 flex items-center justify-center text-white cursor-pointer"
-                  style={{
-                    width: '28px',
-                    height: '28px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                    borderRadius: '50%',
-                    transition: 'background-color 200ms ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.3)')}
-                  aria-label="Close expanded card"
-                >
-                  <X style={{ width: '20px', height: '20px' }} className="text-white" />
-                </button>
-
-                {/* Bottom Overlay Content */}
-                <div className="absolute bottom-[24px] left-[24px] right-[24px] z-30 flex flex-col items-center text-center">
-                  <h3 className="text-white font-bold text-[22px] leading-tight mb-[2px]">
-                    {expandedCard.name}
-                  </h3>
-                  <p className="text-[#B7E4C7] text-[14px] leading-tight mb-[16px]">
-                    {expandedCard.location}
-                  </p>
-
-                  {/* Larger "Travel?" Button */}
-                  <button
-                    type="button"
-                    onClick={() => window.open(expandedCard.wiki, '_blank')}
-                    className="text-white text-[13px] underline rounded-[20px] cursor-pointer"
+                return (
+                  <div
+                    key={`pos-${posIdx}`}
                     style={{
-                      padding: '8px 20px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                      border: '1px solid rgba(255, 255, 255, 0.35)',
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      marginTop: `-${pos.height / 2}px`,
+                      marginLeft: `-${pos.width / 2}px`,
+                      width: `${pos.width}px`,
+                      height: `${pos.height}px`,
+                      borderRadius: `${pos.borderRadius}px`,
+                      zIndex: pos.zIndex,
+                      overflow: 'hidden',
+                      opacity: pos.opacity,
+                      boxShadow: pos.boxShadow,
+                      '--card-transform': pos.transform,
+                      animation: `${animName} ${pos.floatDuration} ${pos.floatDelay} ease-in-out infinite alternate`,
+                      transition: 'transform 600ms cubic-bezier(0.4,0,0.2,1), opacity 600ms cubic-bezier(0.4,0,0.2,1), box-shadow 600ms cubic-bezier(0.4,0,0.2,1), width 600ms cubic-bezier(0.4,0,0.2,1), height 600ms cubic-bezier(0.4,0,0.2,1)',
+                      cursor: isCenter ? 'pointer' : 'default',
+                      transform: isCenter && centerHovered ? `${pos.transform} scale(1.04)` : undefined,
                     }}
+                    onMouseEnter={isCenter ? () => setCenterHovered(true) : undefined}
+                    onMouseLeave={isCenter ? () => setCenterHovered(false) : undefined}
+                    onClick={isCenter ? () => window.open(card.wiki, '_blank') : undefined}
                   >
-                    Travel?
-                  </button>
-                </div>
-              </div>
-            )}
+                    {/* Card image */}
+                    <img
+                      src={card.image}
+                      alt={card.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                      }}
+                      draggable={false}
+                    />
+
+                    {/* Dark gradient overlay */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)',
+                        pointerEvents: 'none',
+                      }}
+                    />
+
+                    {/* Center card hover info */}
+                    {isCenter && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          padding: '14px 14px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          textAlign: 'center',
+                          opacity: centerHovered ? 1 : 0,
+                          transition: 'opacity 300ms ease',
+                          pointerEvents: centerHovered ? 'auto' : 'none',
+                        }}
+                      >
+                        <span style={{ color: '#fff', fontWeight: 700, fontSize: '13px', lineHeight: '1.2', display: 'block' }}>
+                          {card.name}
+                        </span>
+                        <span style={{ color: '#B7E4C7', fontSize: '11px', marginTop: '2px', display: 'block' }}>
+                          {card.location}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); window.open(card.wiki, '_blank'); }}
+                          style={{
+                            marginTop: '8px',
+                            color: '#fff',
+                            fontSize: '11px',
+                            textDecoration: 'underline',
+                            background: 'rgba(255,255,255,0.15)',
+                            backdropFilter: 'blur(8px)',
+                            WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.35)',
+                            borderRadius: '20px',
+                            padding: '4px 12px',
+                            cursor: 'pointer',
+                            pointerEvents: 'auto',
+                          }}
+                        >
+                          Travel?
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
+
+          {/* Dot Indicators */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginBottom: '14px',
+              zIndex: 20,
+            }}
+          >
+            {PHOTO_CARDS.map((_, idx) => {
+              // active dot = whichever card is currently at center position (posIdx=2)
+              const activeDotIdx = (2 + carouselOffset) % PHOTO_CARDS.length;
+              const isActive = idx === activeDotIdx;
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    width: isActive ? '20px' : '8px',
+                    height: '8px',
+                    borderRadius: '4px',
+                    backgroundColor: isActive ? '#fff' : 'rgba(255,255,255,0.35)',
+                    transition: 'all 300ms ease',
+                  }}
+                />
+              );
+            })}
+          </div>
+
+          {/* Bottom tagline */}
+          <p
+            style={{
+              color: '#fff',
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: 700,
+              fontSize: '15px',
+              textAlign: 'center',
+              lineHeight: '1.4',
+              paddingBottom: '4px',
+              zIndex: 20,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Protecting Forests,<br />One Sensor at a Time
+          </p>
         </div>
 
         {/* RIGHT COLUMN (55% width on desktop, 100% on mobile) */}
