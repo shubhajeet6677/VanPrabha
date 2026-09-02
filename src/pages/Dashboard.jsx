@@ -1,16 +1,18 @@
 import React, { useState, useMemo } from 'react';
+import { fetchPaidSensorData } from '../x402/paidFetch';
+import PeraWallet from '../wallet/PeraWallet';
 import Layout from '../components/Layout';
 import ParkMap from '../components/ParkMap';
 import Tooltip from '../components/Tooltip';
 import { PARKS_LIST } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  TreePine, 
-  Cpu, 
-  Bell, 
-  WifiOff, 
-  MapPin, 
-  Activity, 
+import {
+  TreePine,
+  Cpu,
+  Bell,
+  WifiOff,
+  MapPin,
+  Activity,
   ChevronRight,
   ShieldAlert,
   CloudSun,
@@ -20,6 +22,34 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const [sensorData, setSensorData] = useState(null);
+  const [loadingSensorData, setLoadingSensorData] = useState(false);
+  const [sensorError, setSensorError] = useState(null);
+
+  const handleAccessSensorData = async () => {
+    try {
+      setLoadingSensorData(true);
+      setSensorError(null);
+
+      const wallet = window.vanPrabhaX402;
+
+      if (!wallet) {
+        throw new Error("Please connect your Pera Wallet first.");
+      }
+
+      const data = await fetchPaidSensorData(
+        wallet.httpClient,
+        wallet.client
+      );
+
+      setSensorData(data);
+    } catch (error) {
+      console.error("Sensor data payment failed:", error);
+      setSensorError(error.message);
+    } finally {
+      setLoadingSensorData(false);
+    }
+  };
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [selectedParkId, setSelectedParkId] = useState(null);
@@ -97,7 +127,72 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="space-y-8 py-2">
-        
+
+        <PeraWallet />
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white">
+                Live Sensor Data
+              </h2>
+              <p className="mt-1 text-sm text-gray-400">
+                Access real-time forest sensor readings.
+              </p>
+            </div>
+
+            <button
+              onClick={handleAccessSensorData}
+              disabled={loadingSensorData}
+              className="rounded-xl bg-emerald-500 px-5 py-3 font-medium text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loadingSensorData
+                ? "Processing..."
+                : "Access Data — $0.01"}
+            </button>
+          </div>
+
+          {sensorError && (
+            <p className="mt-4 text-sm text-red-400">
+              {sensorError}
+            </p>
+          )}
+
+          {sensorData && (
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {sensorData.sensors?.map((sensor) => (
+                <div
+                  key={sensor.id}
+                  className="rounded-xl border border-white/10 bg-black/20 p-4"
+                >
+                  <p className="font-semibold text-white">
+                    {sensor.id}
+                  </p>
+
+                  <p className="mt-1 text-sm text-gray-400">
+                    {sensor.location}
+                  </p>
+
+                  <div className="mt-4 space-y-2 text-sm text-gray-300">
+                    <p>
+                      Temperature: {sensor.temperature}°C
+                    </p>
+                    <p>
+                      Humidity: {sensor.humidity}%
+                    </p>
+                    <p>
+                      Air Quality: {sensor.airQuality}
+                    </p>
+                    <p>
+                      Status: {sensor.status}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* DASHBOARD HEADER WITH DYNAMIC GREETING & WEATHER WIDGET */}
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -179,8 +274,8 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {sensorReadings.map((sensor) => (
-              <div 
-                key={sensor.id} 
+              <div
+                key={sensor.id}
                 className="p-4 bg-slate-50/90 border border-slate-200 rounded-xl card-hover space-y-2"
               >
                 <div className="flex items-center justify-between">
@@ -223,7 +318,7 @@ export default function Dashboard() {
 
         {/* ROW 2: GIS Map & Active Alerts Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+
           {/* Map Container (8/12) */}
           <div className="lg:col-span-8 bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col card-hover">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 pb-3 border-b border-slate-100 gap-2">
@@ -236,7 +331,7 @@ export default function Dashboard() {
                   Interactive telemetry markers & GIS zoning across National Capital Region
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#2D6A4F] status-glow-online"></span> Normal
@@ -251,10 +346,10 @@ export default function Dashboard() {
             </div>
 
             <div className="flex-1 min-h-[400px] relative">
-              <ParkMap 
-                parks={mapParks} 
-                selectedParkId={selectedParkId} 
-                onSelectPark={(id) => setSelectedParkId(id)} 
+              <ParkMap
+                parks={mapParks}
+                selectedParkId={selectedParkId}
+                onSelectPark={(id) => setSelectedParkId(id)}
               />
             </div>
           </div>
@@ -273,7 +368,7 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-3">
-                <div 
+                <div
                   onClick={() => navigate('/alerts')}
                   className="p-3.5 bg-red-50/60 rounded-xl border border-red-200/80 hover:border-red-400 transition-all cursor-pointer space-y-1 card-hover"
                 >
@@ -285,7 +380,7 @@ export default function Dashboard() {
                   <div className="text-[10px] text-slate-400 font-semibold">Updated 3 mins ago</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => navigate('/alerts')}
                   className="p-3.5 bg-red-50/60 rounded-xl border border-red-200/80 hover:border-red-400 transition-all cursor-pointer space-y-1 card-hover"
                 >
@@ -297,7 +392,7 @@ export default function Dashboard() {
                   <div className="text-[10px] text-slate-400 font-semibold">Updated 5 mins ago</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => navigate('/alerts')}
                   className="p-3.5 bg-amber-50/60 rounded-xl border border-amber-200/80 hover:border-amber-400 transition-all cursor-pointer space-y-1 card-hover"
                 >
