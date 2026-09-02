@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@perawallet/connect": "^1.6.0",
+    "@x402/avm": "^2.24.0",
+    "@x402/core": "^2.24.0",
     "framer-motion": "^13.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.37.0",
